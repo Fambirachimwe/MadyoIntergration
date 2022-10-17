@@ -1,4 +1,12 @@
+import 'dotenv/config'
+import axios from 'axios';
 import Twilio from 'twilio';
+import { apiUrl } from './constants.js';
+import 'dotenv/config';
+import { Paynow } from 'paynow';
+import { nanoid } from 'nanoid';
+
+let paynow = new Paynow(process.env.INTERGRATION_ID, process.env.INTERGRATION_KEY);
 
 
 
@@ -48,13 +56,18 @@ export const generateAirtimeVendorRefence = (ref) => {
     reference = null;
     return newRef;
 
+}
 
 
+export const generateZesaVendorRefence = () => {
 
-
-
+    let reference = 'ZETDC_';
+    const newRef = reference + randomString(16, 'aA')
+    return newRef;
 
 }
+
+
 
 
 
@@ -89,7 +102,7 @@ export const sendSMS = async (to, data) => {
             Airtime Credited, New Balance ${data.data.finalBalance}
             `,
             from: "+12059278608",
-            to: `${to}`
+            to: `+${to}`
         }
         ).then(() => {
             console.log('message sent')
@@ -97,4 +110,134 @@ export const sendSMS = async (to, data) => {
         }
         )
 
+}
+
+export const sendZesaToken = async (to, data) => {
+
+    const accountSid = process.env.TWILIO_ACCOUNT_SID;
+    const authToken = process.env.TWILIO_AUTH_TOKEN;
+    const client = new Twilio(accountSid, authToken);
+    // const accountNumber = process.env.TWILIO_TEST_NUMBER
+    client.messages
+        .create({
+            body: `
+            token:,  ${data}
+            `,
+            from: "+12059278608",
+            to: `+${to}`
+        }
+        ).then(() => {
+            console.log('message sent')
+
+        }
+        )
+
+}
+
+export const failedZesaToken = async (to, data) => {
+
+    const accountSid = process.env.TWILIO_ACCOUNT_SID;
+    const authToken = process.env.TWILIO_AUTH_TOKEN;
+    const client = new Twilio(accountSid, authToken);
+    // const accountNumber = process.env.TWILIO_TEST_NUMBER
+    client.messages
+        .create({
+            body: `${data}`,
+            from: "+12059278608",
+            to: `+${to}`
+        }
+        ).then(() => {
+            console.log('message sent')
+
+        }
+        )
+
+}
+
+
+
+export const tokenResend = (data) => {
+
+    return axios.post(`${apiUrl}/zesa/tokenResend`,
+
+        // payload
+
+        {
+            "mti": "0201",
+            "vendorReference": generateZesaVendorRefence(),
+            "processingCode": "U50000",
+            "vendorNumber": data.data.vendorNumber,
+            "utilityAccount": data.data.utilityAccount,
+            "transactionAmount": data.data.transactionAmount,
+            "transmissionDate": nowDate(),
+            "originalReference": data.data.vendorReference,
+            "merchantName": "ZETDC",
+            "productName": "ZETDC_PREPAID",
+            "currencyCode": "ZWL"
+        },
+        // auth object
+
+    )
+
+
+}
+
+
+const formatPhoneNumber = (number) => {
+    // 
+    const _num = number.slice(3);
+    return `0${_num}`
+}
+
+
+export const mobilePay = async (amount, method, customerPhoneNumber) => {
+
+
+    const invoiceNumber = nanoid(5);
+
+
+    // use this number  to make the  payment after the account has been made live 
+    const newNumber = formatPhoneNumber(customerPhoneNumber);
+
+
+
+
+
+
+    paynow.resultUrl = "http://example.com/gateways/paynow/update";
+    paynow.returnUrl = "http://example.com/return?gateway=paynow&merchantReference=1234";
+
+    let payment = paynow.createPayment(invoiceNumber, process.env.AUTH_EMAIL)
+    payment.add('DepositAmount', amount);
+
+    await paynow.sendMobile(
+        payment,
+        // The phone number making payment
+        '0771111111',  // this is a test phone number
+
+        // `${customerPhoneNumber}`,
+        // The mobile money method to use.  ecocash, onemoney, telecel
+
+        // `${method}`
+        'ecocash'
+
+    )
+        .then(async (response) => {
+
+            if (response && response.success) {
+                console.log('ecocash transaction complete')
+
+                return {
+                    message: 'success'
+                }
+
+            } else {
+                // console.log('network err')
+
+                return {
+                    message: "No response. Network error "
+                }
+            }
+
+        })
 }

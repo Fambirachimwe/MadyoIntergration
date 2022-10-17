@@ -23,3 +23,20 @@ export const responseCodes = {
     "68": "Transaction timeout",
     "94": "Dublicate transaction"
 }
+
+export const testVendorNumber = "VE19257147501";
+
+export const vendorNumbers = {
+    econet: "VE19257147501",
+    netone: 'VE19257147502',
+    telecel: "VE19257147503",
+    zetdc: '',
+    dstv: '',
+    moonlight: '',
+    nyaradzo: ''
+
+}
+
+
+export const apiUrl = "http://localhost:5500"
+

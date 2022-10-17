@@ -1,18 +1,18 @@
 import axios from 'axios';
-import { randomString, generateAirtimeVendorRefence, nowDate, sendSMS } from '../util/util.js'
-import Airtime from '../models/airtime.js';
-import { vendorNumbers } from '../util/constants.js'
-import { nanoid } from 'nanoid';
+import { generateAirtimeVendorRefence, nowDate, sendSMS } from '../util/util.js'
+import Airtime from '../models/airtime.js'
+import { nanoid } from 'nanoid'
+import { testVendorNumber } from '../util/constants.js';
 
 
 const url = process.env.BASE_URL;
 
-const econetSourceMobile = "263772978751";  // this is our source  account phonenumber .... represents us as the merchant
-const netoneSouceMobile = ""
+const econetSourceMobile = "263772978751";
+const netoneSouceMobile = "263719403033"
 const telecelSourveMobile = ""
 
 
-export const econetAirtimeController = (req, res, next) => {
+export const telecelAirtimeController = (req, res, next) => {
 
     // source mobile is the line which airtime is going to be deducted
 
@@ -24,23 +24,28 @@ export const econetAirtimeController = (req, res, next) => {
         return res.send("Failed to buy airtime. Maximum amount is $20.00")
     }
     else {
+
+
         axios.post(`${url}`,
 
             //  pass this data in the body of the api 
             {
                 "mti": "0200",
-                "vendorReference": generateAirtimeVendorRefence("econet"),
+                "vendorReference": generateAirtimeVendorRefence("telecel"),
+                // "vendorReference": "liveNetOne1222",
                 "processingCode": "U50000",
-                "vendorNumber": vendorNumbers.econet,
+                "vendorNumber": testVendorNumber, // this must be unique for each  vendor
                 "transactionAmount": cents,
-                "sourceMobile": econetSourceMobile,
+                "sourceMobile": netoneSouceMobile,
                 "targetMobile": targetMobile,
                 "utilityAccount": targetMobile,
-                "merchantName": "ECONET",
-                "productName": "ECONET_AIRTIME",
+                "merchantName": "TELECEL",
+                "productName": "TELECEL_AIRTIME",
                 "transmissionDate": nowDate(),
-                "currencyCode": "ZWL"
+                "currencyCode": "ZWL",
             },
+
+
             // auth object
 
             {
@@ -57,17 +62,28 @@ export const econetAirtimeController = (req, res, next) => {
                         message: "Error",
                         description: data.data.narrative
                     })
-                } else {
+                }
+
+                //  still in progress
+                if (data.data.responseCode === "09") {
+                    //  resend the request again with the  reference number
+
+                    res.send('transaction still in progress ');
+                }
+
+
+                else {
                     // save transaction in the database and  send and sms to 
                     // the client with the credited amount and the client final balance after airtime purchase
 
-                    const { vendorReference, transactionAmount, utilityAccount, narrative, currencyCode, sourceMobile, targetMobile, transmissionDate } = data.data;
+                    // console.log(data.data)
 
+                    const { vendorReference, transactionAmount, utilityAccount, narrative, currencyCode, sourceMobile, targetMobile, transmissionDate } = data.data;
                     //  save the airtime transaction in the database 
                     new Airtime({
                         orderNumber: nanoid(10),
                         vendorReference: vendorReference,
-                        type: "econet",
+                        type: "netone",
                         amount: transactionAmount / 100,
                         status: "success",
                         utilityAccount: utilityAccount,
@@ -80,7 +96,7 @@ export const econetAirtimeController = (req, res, next) => {
                         .save()
                         .then(() => {
                             //  send SMS to client using Twilio
-                            sendSMS(`+${targetMobile}`, data.data)
+                            sendSMS(`+${targetMobile}`, data)
                         })
 
                     res.send(data.data)

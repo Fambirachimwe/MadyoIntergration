@@ -2,6 +2,7 @@ import axios from 'axios';
 import { generateAirtimeVendorRefence, nowDate, sendSMS } from '../util/util.js'
 import Airtime from '../models/airtime.js'
 import { nanoid } from 'nanoid'
+import { testVendorNumber } from '../util/constants.js';
 
 
 const url = process.env.BASE_URL;
@@ -24,7 +25,7 @@ export const netoneAirtimeController = (req, res, next) => {
     }
     else {
 
-        console.log(generateAirtimeVendorRefence('netone'))
+
         axios.post(`${url}`,
 
             //  pass this data in the body of the api 
@@ -33,7 +34,7 @@ export const netoneAirtimeController = (req, res, next) => {
                 "vendorReference": generateAirtimeVendorRefence("netone"),
                 // "vendorReference": "liveNetOne1222",
                 "processingCode": "U50000",
-                "vendorNumber": "VE19257147501", // this must be unique for each  vendor
+                "vendorNumber": testVendorNumber, // this must be unique for each  vendor
                 "transactionAmount": cents,
                 "sourceMobile": netoneSouceMobile,
                 "targetMobile": targetMobile,
@@ -64,7 +65,8 @@ export const netoneAirtimeController = (req, res, next) => {
 
                 //  still in progress
                 if (data.data.responseCode === "09") {
-
+                    //  resend the request again with the  reference number
+                    console.log('transaction still in progress')
                 }
 
 
@@ -72,11 +74,12 @@ export const netoneAirtimeController = (req, res, next) => {
                     // save transaction in the database and  send and sms to 
                     // the client with the credited amount and the client final balance after airtime purchase
 
-                    console.log(data.data)
+                    // console.log(data.data)
 
                     const { vendorReference, transactionAmount, utilityAccount, narrative, currencyCode, sourceMobile, targetMobile, transmissionDate } = data.data;
                     //  save the airtime transaction in the database 
                     new Airtime({
+                        orderNumber: nanoid(10),
                         vendorReference: vendorReference,
                         type: "netone",
                         amount: transactionAmount / 100,
