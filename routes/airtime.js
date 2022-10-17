@@ -1,52 +1,29 @@
 import 'dotenv/config';
 import express from 'express';
 import axios from 'axios';
-import { randomString } from '../util/util.js'
+
+
+import { econetAirtimeController } from '../controllers/econetAirtime.controller.js'
+import { netoneAirtimeController } from '../controllers/netoneAirtime.controller.js';
+
+
+
 
 const router = express.Router();
 const url = process.env.BASE_URL;
 
-router.post(`/econet/buy`, (req, res, next) => {
-    axios.post(`${url}`,
+const econetSourceMobile = "263772978751";
+const netoneSouceMobile = ""
+const telecelSourveMobile = ""
 
-        //  pass this data in the body of the api 
-        { "mti": "0200", "vendorReference": randomString(16, 'aA'), "processingCode": "U50000", "vendorNumber": "VE20245865801", "transactionAmount": 500, "sourceMobile": "263772978751", "targetMobile": "263776412771", "utilityAccount": "263772978751", "merchantName": "ECONET", "productName": "ECONET_AIRTIME", "transmissionDate": 91916182800, "currencyCode": "ZWL" },
-        // auth object
+/**
+ * Transmission Date Format: MMDDYYHHmmss Description: The date and time when the message is sent. 
+ * Example: 121713061713 represents 17 December 2013 at time 06:17:13 AM
+ */
 
-        {
-            auth: {
-                username: process.env.API_USERNAME,
-                password: process.env.API_PASSWORD
-            }
-        }
+router.post(`/econet/buy`, econetAirtimeController);
 
-
-
-    ).then(data => {
-        res.send(data.data)
-    })
-});
-
-router.post(`/netone/buy`, (req, res, next) => {
-    axios.post(`${url}`,
-
-        //  pass this data in the body of the api 
-        { "mti": "0200", "vendorReference": "liveNetOne13", "processingCode": "U50000", "vendorNumber": "VE19257147501", "transactionAmount": 100, "originalReference": null, "sourceMobile": "26371XXXXXX", "targetMobile": "26371XXXXXX", "utilityAccount": "26371XXXXXX", "merchantName": "NETONE", "productName": "NETONE_AIRTIME", "transmissionDate": 91916182800, "currencyCode": "ZWL", "serviceId": "CS" },
-        // auth object
-
-        {
-            auth: {
-                username: process.env.API_USERNAME,
-                password: process.env.API_PASSWORD
-            }
-        }
-
-
-
-    ).then(data => {
-        res.send(data.data)
-    })
-});
+router.post(`/netone/buy`, netoneAirtimeController);
 
 router.post(`/telecel/buy`, (req, res, next) => {
     axios.post(`${url}`,

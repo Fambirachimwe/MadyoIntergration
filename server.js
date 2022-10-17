@@ -4,8 +4,16 @@ import vendorRoutes from './routes/vendor.js';
 import zesaRoutes from './routes/zesa.js';
 import dstvRoutes from './routes/dstv.js'
 import airTimeRoutes from './routes/airtime.js';
+import mongoose from "mongoose";
 
 
+// connection to mongoDB
+mongoose.connect('mongodb://localhost/Madyozw', { useNewUrlParser: true });
+mongoose.connection.once('open', () => {
+    console.log('Connected to Madyozw');
+}).on('error', (error) => {
+    console.log('connection error ', error);
+});
 
 
 
