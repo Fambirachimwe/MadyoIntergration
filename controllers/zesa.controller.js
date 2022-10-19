@@ -45,87 +45,103 @@ export const getCustomer = (req, res, next) => {
 export const buyToken = (req, res, next) => {
 
 
-    const { amount, meterNumber, phoneNumber, method } = req.body;
+    const { amount, meterNumber, phoneNumber, method } = req.body;  // the phone number is the paying phoneNumber on the frontend t
 
     // 41234567890  demo meterNumber
     const cents = amount * 100;
+    // console.log(phoneNumber)
 
     // make mobile payment here  using paynow
-    mobilePay(amount, method, phoneNumber).then(() => {
-        axios.post(`${url}`,
-            //  pass this data in the body of the api 
-            {
-                "mti": "0200",
-                "vendorReference": generateZesaVendorRefence(),
-                "processingCode": "U50000",
-                "transactionAmount": cents,
-                // "amount": 60000,  
-                "transmissionDate": nowDate(),
-                "vendorNumber": testVendorNumber,  // replace this with the offical vendor number
-                "terminalID": "POS001",
-                "merchantName": "ZETDC",
-                "utilityAccount": meterNumber,  // this is the meter number of the customer 
-                "aggregator": "POWERTEL",
-                "productName": "ZETDC_PREPAID",
-                "currencyCode": "ZWL"
-            },
-            // auth object
+    mobilePay(amount, method, phoneNumber).then((data) => {
 
-            {
-                auth: {
-                    username: process.env.API_USERNAME,
-                    password: process.env.API_PASSWORD
+        if (data.success) {
+            axios.post(`${url}`,
+                //  pass this data in the body of the api 
+                {
+                    "mti": "0200",
+                    "vendorReference": generateZesaVendorRefence(),
+                    "processingCode": "U50000",
+                    "transactionAmount": cents,
+                    // "amount": 60000,  
+                    "transmissionDate": nowDate(),
+                    "vendorNumber": testVendorNumber,  // replace this with the offical vendor number
+                    "terminalID": "POS001",
+                    "merchantName": "ZETDC",
+                    "utilityAccount": meterNumber,  // this is the meter number of the customer 
+                    "aggregator": "POWERTEL",
+                    "productName": "ZETDC_PREPAID",
+                    "currencyCode": "ZWL"
+                },
+                // auth object
+
+                {
+                    auth: {
+                        username: process.env.API_USERNAME,
+                        password: process.env.API_PASSWORD
+                    }
                 }
-            }
 
-        ).then(data => {
-            // res.send(data.data)
+            ).then(data => {
+                // res.send(data.data)
 
-            if (data.data.responseCode !== "00") {
+                if (data.data.responseCode !== "00") {
 
-                // set a timeout to resend the request again   
-                setTimeout(() => {
-                    tokenResend(data).then(response => {
+                    // set a timeout to resend the request again   
+                    setTimeout(() => {
+                        tokenResend(data).then(response => {
 
-                        if (response.data.responseCode === "00") {
-                            new Zesa({ ...response.data, orderNumber: nanoid(10) })
-                                .save()
-                                .then(saved_data => {
-                                    //  save the transaction fater it has been saved into the database 
-                                    sendZesaToken(phoneNumber, saved_data.token);
+                            if (response.data.responseCode === "00") {
+                                new Zesa({ ...response.data, orderNumber: nanoid(10) })
+                                    .save()
+                                    .then(saved_data => {
+                                        //  save the transaction fater it has been saved into the database 
+                                        sendZesaToken(phoneNumber, saved_data.token);
+                                    })
+                                res.send(response.data)
+
+                            } else {
+
+                                // failedZesaToken(phoneNumber, "failed to purchase zesa token")
+
+
+
+                                res.json({
+                                    message: "Error",
+                                    payload: response.data.narrative
                                 })
-                            res.send(response.data)
+                            }
+                        })
 
-                        } else {
-
-                            failedZesaToken(phoneNumber, "failed to purchase zesa token")
-
-                            res.json({
-                                message: "failed to purchase token ",
-                                payload: response.data.narrative
-                            })
-                        }
-                    })
-
-                }, 3000);  // specify the time  after 60sec.. 
+                    }, 3000);  // specify the time  after 60sec.. 
 
 
-            } else {
+                } else {
 
-                // save the transaction in the database
+                    // save the transaction in the database
 
-                new Zesa({ ...data.data, orderNumber: nanoid(10) })
-                    .save()
-                    .then(saved_data => {
-                        console.log('saved into the database ', saved_data);
-                        sendZesaToken(phoneNumber, saved_data.token);
-                    })
+                    new Zesa({ ...data.data, orderNumber: nanoid(10) })
+                        .save()
+                        .then(saved_data => {
+                            console.log('saved into the database ', saved_data);
+                            sendZesaToken(phoneNumber, saved_data.token);
+                        })
 
 
-                res.send(data.data)
-            }
+                    res.send(data.data)
+                }
 
-        })
+            })
+        } else {
+            // send an error response
+            res.json({
+                message: "Error",
+                description: data.data
+            })
+        }
+
+        // console.log(data)
+
+
     })
 
 

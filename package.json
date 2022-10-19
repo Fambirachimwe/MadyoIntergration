@@ -17,6 +17,7 @@
     "mongoose": "^6.6.5",
     "nanoid": "^4.0.0",
     "paynow": "^1.0.9",
+    "sweetalert2": "^11.5.2",
     "twilio": "^3.82.2"
   },
   "type": "module"

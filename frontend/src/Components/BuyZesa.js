@@ -23,13 +23,108 @@ import Zesa from '../images/zesa.png';
 import Ecocash from '../images/ecocash.png';
 import Onemoney from '../images/onemoney.png';
 import loadingGif from '../images/loader1.gif'
+import { useState } from 'react';
+import axios from 'axios';
+import { fomartNumber } from '../util/util';
+import Swal from "sweetalert2";
+
+
+
 
 
 
 
 export default function BuyZesa() {
 
-    const { isOpen, onOpen, onClose } = useDisclosure()
+    const { isOpen, onOpen, onClose } = useDisclosure();
+
+    const initialState = {
+        payingNumber: "",
+        meterNumber: "",
+        amount: "",
+    };
+
+
+    const [state, setState] = useState(initialState);
+
+    const handleChange = (evt) => {
+        const value = evt.target.value;      // console.log('firing the handle change  function');
+        setState({
+            ...state,
+            [evt.target.name]: value
+        });
+    }
+
+    const handleSubmit = (e) => {
+
+        // check if the paying number is and econet number or netone number 
+        const netone = /^071/;
+        const econet = /^078|^077/;
+        const telecel = /^073/;
+
+        const zesaUrl = "http://localhost:5500/zesa/buyToken"
+
+
+
+        if (econet.test(state.payingNumber)) {
+
+
+            // make the payment using ecocacash
+            axios.post(`${zesaUrl}`,
+                {
+                    "amount": state.amount,
+                    "meterNumber": state.meterNumber,
+                    "phoneNumber": fomartNumber(state.payingNumber),
+                    "method": 'econet'
+
+                }
+            ).then(data => {
+
+                console.log(data)
+                if (data.data.message === "Error") {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Transaction failed',
+                        text: `Failed to purchase zesa token
+                        `,
+
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Successful',
+                        text: `Token paurchase success .. please check your phone for the sms`
+                        ,
+
+                    });
+                }
+                // console.log(data)
+            })
+        }
+
+        if (netone.test(state.payingNumber)) {
+
+
+            // make the payment using ecocacash
+            axios.post(`${zesaUrl}`,
+                {
+                    "amount": state.amount,
+                    "meterNumber": state.meterNumber,
+                    "phoneNumber": fomartNumber(state.payingNumber),
+                    'method': 'onemoney'
+
+                }
+            ).then(data => {
+                console.log(data)
+            })
+        }
+
+
+    }
+
+
+
+
     return (
         <Box position={'relative'}>
 
@@ -118,6 +213,9 @@ export default function BuyZesa() {
                                 _placeholder={{
                                     color: 'gray.500',
                                 }}
+                                onChange={handleChange}
+                                value={state.meterNumber}
+                                name="meterNumber"
                             />
                             <Input
                                 placeholder="Phone Number to pay transaction"
@@ -127,6 +225,9 @@ export default function BuyZesa() {
                                 _placeholder={{
                                     color: 'gray.500',
                                 }}
+                                onChange={handleChange}
+                                value={state.payingNumber}
+                                name="payingNumber"
                             />
                             <Input
                                 placeholder="Amount minimun.... $500.00"
@@ -136,6 +237,9 @@ export default function BuyZesa() {
                                 _placeholder={{
                                     color: 'gray.500',
                                 }}
+                                onChange={handleChange}
+                                value={state.amount}
+                                name="amount"
                             />
 
                         </Stack>
@@ -149,7 +253,7 @@ export default function BuyZesa() {
                                 bgGradient: 'linear(to-r, green.600,green.400)',
                                 boxShadow: 'xl',
                             }}
-                            onClick={onOpen}
+                            onClick={handleSubmit}
                         >
 
 

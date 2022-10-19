@@ -6,7 +6,7 @@ import 'dotenv/config';
 import { Paynow } from 'paynow';
 import { nanoid } from 'nanoid';
 
-let paynow = new Paynow(process.env.INTERGRATION_ID, process.env.INTERGRATION_KEY);
+let paynow = new Paynow(process.env.testId, process.env.testIntergrationKey);
 
 
 
@@ -96,13 +96,15 @@ export const sendSMS = async (to, data) => {
     const authToken = process.env.TWILIO_AUTH_TOKEN;
     const client = new Twilio(accountSid, authToken);
     // const accountNumber = process.env.TWILIO_TEST_NUMBER
+
+    console.log(data)
     client.messages
         .create({
             body: `
-            Airtime Credited, New Balance ${data.data.finalBalance}
+            Airtime Credited,  ${data ? `New Balance ${data.finalBalance}` : "please check you balance"}
             `,
             from: "+12059278608",
-            to: `+${to}`
+            to: `+263${to}`
         }
         ).then(() => {
             console.log('message sent')
@@ -123,8 +125,8 @@ export const sendZesaToken = async (to, data) => {
             body: `
             token:,  ${data}
             `,
-            from: "+12059278608",
-            to: `+${to}`
+            from: "+12059278608", // this is the twilio phone number
+            to: `+263${to}`
         }
         ).then(() => {
             console.log('message sent')
@@ -140,11 +142,12 @@ export const failedZesaToken = async (to, data) => {
     const authToken = process.env.TWILIO_AUTH_TOKEN;
     const client = new Twilio(accountSid, authToken);
     // const accountNumber = process.env.TWILIO_TEST_NUMBER
+    console.log(to)
     client.messages
         .create({
             body: `${data}`,
             from: "+12059278608",
-            to: `+${to}`
+            to: `+263${to}`
         }
         ).then(() => {
             console.log('message sent')
@@ -194,50 +197,40 @@ export const mobilePay = async (amount, method, customerPhoneNumber) => {
 
 
     const invoiceNumber = nanoid(5);
-
-
-    // use this number  to make the  payment after the account has been made live 
-    const newNumber = formatPhoneNumber(customerPhoneNumber);
-
-
-
-
-
-
     paynow.resultUrl = "http://example.com/gateways/paynow/update";
     paynow.returnUrl = "http://example.com/return?gateway=paynow&merchantReference=1234";
 
     let payment = paynow.createPayment(invoiceNumber, process.env.AUTH_EMAIL)
-    payment.add('DepositAmount', amount);
+    payment.add('bill-payment', amount);
 
-    await paynow.sendMobile(
+    return await paynow.sendMobile(
         payment,
         // The phone number making payment
         '0771111111',  // this is a test phone number
 
-        // `${customerPhoneNumber}`,
+        // `0${customerPhoneNumber}`,
         // The mobile money method to use.  ecocash, onemoney, telecel
 
         // `${method}`
         'ecocash'
 
     )
-        .then(async (response) => {
+    // .then(async (response) => {
 
-            if (response && response.success) {
-                console.log('ecocash transaction complete')
+    //     if (response && response.success) {
+    //         console.log('ecocash transaction complete')
 
-                return {
-                    message: 'success'
-                }
+    //         return {
+    //             message: 'success'
+    //         }
 
-            } else {
-                // console.log('network err')
+    //     } else {
+    //         // console.log('network err')
 
-                return {
-                    message: "No response. Network error "
-                }
-            }
+    //         return {
+    //             message: "No response. Network error "
+    //         }
+    //     }
 
-        })
+    // })
 }

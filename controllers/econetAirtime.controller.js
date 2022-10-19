@@ -80,7 +80,7 @@ export const econetAirtimeController = (req, res, next) => {
                         .save()
                         .then(() => {
                             //  send SMS to client using Twilio
-                            sendSMS(`+${targetMobile}`, data.data)
+                            // sendSMS(`+${targetMobile}`, data.data)
                         })
 
                     res.send(data.data)

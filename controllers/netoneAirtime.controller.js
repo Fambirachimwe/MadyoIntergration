@@ -67,6 +67,10 @@ export const netoneAirtimeController = (req, res, next) => {
                 if (data.data.responseCode === "09") {
                     //  resend the request again with the  reference number
                     console.log('transaction still in progress')
+                    res.json({
+                        message: "Error",
+                        description: "Transaction still in progress"
+                    })
                 }
 
 
