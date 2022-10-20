@@ -84,11 +84,11 @@ export default function BuyAirTime() {
                         });
                     } else {
 
-                        // console.log(data)
+                        console.log(data)
                         Swal.fire({
                             icon: 'success',
                             title: 'Successful',
-                            text: `${data.data.narrative} Airtime credited, New Bal ${data.data.finalBalance}
+                            text: `${data.narrative} Airtime credited, New Bal ${data.data.finalBalance}
                             `,
 
                         });

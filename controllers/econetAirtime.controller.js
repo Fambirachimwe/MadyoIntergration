@@ -53,10 +53,12 @@ export const econetAirtimeController = (req, res, next) => {
         )
             .then(data => {
                 if (data.data.responseCode === "05") {
-                    res.json({
-                        message: "Error",
-                        description: data.data.narrative
-                    })
+
+                    res.send(data.data)
+                    // res.json({
+                    //     message: "Error",
+                    //     description: data.data.narrative
+                    // })
                 } else {
                     // save transaction in the database and  send and sms to 
                     // the client with the credited amount and the client final balance after airtime purchase
