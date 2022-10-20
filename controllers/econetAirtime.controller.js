@@ -8,7 +8,7 @@ import { nanoid } from 'nanoid';
 const url = process.env.BASE_URL;
 
 // this is our source  account phonenumber .... represents us as the merchant
-const econetSourceMobile = "263772978751";
+const netoneSouceMobile = "263772978751";
 
 
 export const econetAirtimeController = (req, res, next) => {
@@ -23,9 +23,9 @@ export const econetAirtimeController = (req, res, next) => {
     else {
 
         // validate if the paying number and the targetMobile is an econet phone number
-        const econet = /^078|^077/;   // regex for econet phone number
+        const netone = /^071/;   // regex for econet phone number
 
-        if (econet.test(`0${payingNumber.slice(3)}`)) {
+        if (netone.test(`0${payingNumber.slice(3)}`)) {
 
             // first make payment using ecocash
             mobilePay(amount, 'ecocash', `0${payingNumber.slice(3)}`).then(response => {
@@ -39,17 +39,18 @@ export const econetAirtimeController = (req, res, next) => {
                     axios.post(`${url}`,
                         {
                             "mti": "0200",
-                            "vendorReference": generateAirtimeVendorRefence("econet"),
+                            "vendorReference": generateAirtimeVendorRefence("netone"),
                             "processingCode": "U50000",
-                            "vendorNumber": vendorNumbers.econet,
+                            "vendorNumber": vendorNumbers.netone,
                             "transactionAmount": cents,
-                            "sourceMobile": econetSourceMobile,
+                            "sourceMobile": netoneSouceMobile,
                             "targetMobile": targetMobile,
                             "utilityAccount": targetMobile,
-                            "merchantName": "ECONET",
-                            "productName": "ECONET_AIRTIME",
+                            "merchantName": "NETONE",
+                            "productName": "NETONE_AIRTIME",
                             "transmissionDate": nowDate(),
-                            "currencyCode": "ZWL"
+                            "currencyCode": "ZWL",
+                            "serviceId": "CS"
                         },
                         {
                             auth: {

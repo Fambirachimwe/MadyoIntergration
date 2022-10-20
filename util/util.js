@@ -97,20 +97,22 @@ export const sendSMS = async (to, data) => {
     const client = new Twilio(accountSid, authToken);
     // const accountNumber = process.env.TWILIO_TEST_NUMBER
 
-    console.log(data)
+    console.log(to)
     client.messages
         .create({
             body: `
             Airtime Credited,  ${data ? `New Balance ${data.finalBalance}` : "please check you balance"}
             `,
             from: "+12059278608",
-            to: `+263${to}`
+            to: `${to}`
         }
         ).then(() => {
             console.log('message sent')
 
         }
-        )
+        ).catch(err => {
+            console.log(err)
+        })
 
 }
 
@@ -142,7 +144,7 @@ export const failedZesaToken = async (to, data) => {
     const authToken = process.env.TWILIO_AUTH_TOKEN;
     const client = new Twilio(accountSid, authToken);
     // const accountNumber = process.env.TWILIO_TEST_NUMBER
-    console.log(to)
+    // console.log(to)
     client.messages
         .create({
             body: `${data}`,
@@ -161,6 +163,8 @@ export const failedZesaToken = async (to, data) => {
 
 export const tokenResend = (data) => {
 
+    // console.log(data)
+
     return axios.post(`${apiUrl}/zesa/tokenResend`,
 
         // payload
@@ -169,11 +173,11 @@ export const tokenResend = (data) => {
             "mti": "0201",
             "vendorReference": generateZesaVendorRefence(),
             "processingCode": "U50000",
-            "vendorNumber": data.data.vendorNumber,
-            "utilityAccount": data.data.utilityAccount,
-            "transactionAmount": data.data.transactionAmount,
+            "vendorNumber": data.vendorNumber,
+            "utilityAccount": data.utilityAccount,
+            "transactionAmount": data.transactionAmount,
             "transmissionDate": nowDate(),
-            "originalReference": data.data.vendorReference,
+            "originalReference": data.vendorReference,
             "merchantName": "ZETDC",
             "productName": "ZETDC_PREPAID",
             "currencyCode": "ZWL"
@@ -185,12 +189,6 @@ export const tokenResend = (data) => {
 
 }
 
-
-const formatPhoneNumber = (number) => {
-    // 
-    const _num = number.slice(3);
-    return `0${_num}`
-}
 
 
 export const mobilePay = async (amount, method, customerPhoneNumber) => {
