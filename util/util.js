@@ -215,22 +215,5 @@ export const mobilePay = async (amount, method, customerPhoneNumber) => {
         'ecocash'
 
     )
-    // .then(async (response) => {
 
-    //     if (response && response.success) {
-    //         console.log('ecocash transaction complete')
-
-    //         return {
-    //             message: 'success'
-    //         }
-
-    //     } else {
-    //         // console.log('network err')
-
-    //         return {
-    //             message: "No response. Network error "
-    //         }
-    //     }
-
-    // })
 }
