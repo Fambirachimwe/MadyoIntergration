@@ -1,15 +1,48 @@
 import axios from 'axios';
-import { generateAirtimeVendorRefence, nowDate, sendSMS } from '../util/util.js'
+import { generateAirtimeVendorRefence, mobilePay, nowDate, sendSMS } from '../util/util.js'
 import Airtime from '../models/airtime.js'
 import { nanoid } from 'nanoid'
-import { testVendorNumber } from '../util/constants.js';
+import { testVendorNumber, vendorNumbers } from '../util/constants.js';
+import { load } from 'cheerio';
 
 
 const url = process.env.BASE_URL;
 
 const econetSourceMobile = "263772978751";
 const netoneSouceMobile = "263719403033"
-const telecelSourceMobile = ""
+const telecelSourceMobile = "2634229886"
+
+var my_status;
+
+const getTransactioStatus = async (_polUrl) => {
+    const response = await axios.get(_polUrl);
+    const $ = load(response.data);
+    const splited = $('body').text().split('&')
+    let reference, paynowReference, amount, status, polUrl, hash;
+
+    reference = splited[0].split('=')[1].replaceAll('%', ' ');
+    paynowReference = splited[1].split('=')[1].replaceAll('%', ' ');
+    amount = splited[2].split('=')[1].replaceAll('%', ' ');
+    status = splited[3].split('=')[1].replaceAll('%', ' ');
+    polUrl = splited[4].split('=')[1].replaceAll('%', ' ');
+    hash = splited[5].split('=')[1].replaceAll('%', ' ');
+
+    if (status === "Sent") {
+        my_status = status;
+        console.log(status)
+
+        setTimeout(() => {
+            getTransactioStatus(_polUrl)
+        }, 5000);
+
+    } else {
+
+        console.log('chage the status', status);
+        my_status = status;
+        // return transactionStatus;
+    }
+}
+
 
 
 export const telecelAirtimeController = (req, res, next) => {
@@ -19,96 +52,131 @@ export const telecelAirtimeController = (req, res, next) => {
     const cents = amount * 100;
 
     if (cents > 2000) {
-        return res.send("Failed to buy airtime. Maximum amount is $20.00")
+
+        return res.json({
+            error: 'err01',
+            message: "Failed to buy airtime. Maximum amount is $20.00"
+        })
+        // return res.send("Failed to buy airtime. Maximum amount is $20.00")
     }
     else {
+
         // validate if the paying number and the targetMobile is an econet phone number
-        const econet = /^078|^077/;   // regex for econet phone number
+        const telecel = /^073/;   // regex for econet phone number
+        const econet = /^077|^078/;
 
-        if (econet.test(`0${payingNumber.slice(3)}`)) {
+        if (telecel.test(`0${targetMobile.slice(3)}`)) {
+            if (econet.test(`0${payingNumber.slice(3)}`)) {
 
-            // first make payment using ecocash
-            mobilePay(amount, 'ecocash', `0${payingNumber.slice(3)}`).then(response => {
+                // first make payment using ecocash
+                mobilePay(amount, 'ecocash', `0${payingNumber.slice(3)}`).then(async response => {
 
-                if (response && response.success) {
-                    console.log('ecocash transaction complete');
-
-                    // continue the transaction here
-                    // make a post request to the esolutions API
-
-                    axios.post(`${url}`,
-                        {
-                            "mti": "0200",
-                            "vendorReference": generateAirtimeVendorRefence("telecel"),
-                            "processingCode": "U50000",
-                            "vendorNumber": vendorNumbers.telecel,
-                            "transactionAmount": cents,
-                            "sourceMobile": telecelSourceMobile,
-                            "targetMobile": targetMobile,
-                            "utilityAccount": targetMobile,
-                            "merchantName": "TELECEL",
-                            "productName": "TELECEL_AIRTIME",
-                            "transmissionDate": nowDate(),
-                            "currencyCode": "ZWL"
-                        },
-                        {
-                            auth: {
-                                username: process.env.API_USERNAME,
-                                password: process.env.API_PASSWORD
-                            }
+                    if (response && response.success) {
+                        while (my_status === "Sent" || my_status === undefined) {
+                            await getTransactioStatus(response.pollUrl);
                         }
 
-                    )
-                        .then(data => {
-                            if (data.data.responseCode === "05") {
+                        if (my_status === "Cancelled") {
 
-                                // res.send(data.data)
-                                console.log("General Error.. response code 05")
-                                res.json({
-                                    message: "Error",
-                                    description: data.data.narrative
+                            return res.json({
+                                error: 'err01',
+                                message: "Ecocash confirmation failed"
+                            })
+                        }
+
+                        else if (my_status === "Paid") {
+                            console.log('ecocash transaction complete')
+                            // continue the transaction here
+                            // make a post request to the esolutions API
+                            axios.post(`${url}`,
+                                {
+                                    "mti": "0200",
+                                    "vendorReference": generateAirtimeVendorRefence("telecel"),
+                                    "processingCode": "U50000",
+                                    "vendorNumber": vendorNumbers.econet,
+                                    "transactionAmount": cents,
+                                    "sourceMobile": telecelSourceMobile,
+                                    "targetMobile": targetMobile,
+                                    "utilityAccount": targetMobile,
+                                    "merchantName": "TELECEL",
+                                    "productName": "TELECEL_AIRTIME",
+                                    "transmissionDate": nowDate(),
+                                    "currencyCode": "ZWL",
+
+
+                                },
+                                {
+                                    auth: {
+                                        username: process.env.API_USERNAME,
+                                        password: process.env.API_PASSWORD
+                                    }
+                                }
+
+                            )
+                                .then(data => {
+                                    if (data.data.responseCode === "05") {
+
+                                        // res.send(data.data)
+                                        console.log("General Error.. response code 05")
+                                        res.json({
+                                            error: "err01",
+                                            message: data.data.narrative,
+                                            description: data.data
+                                        })
+                                    } else {
+                                        // save transaction in the database and  send an sms to 
+                                        // the client with the credited amount and the client final balance after airtime purchase
+
+                                        const { vendorReference, transactionAmount, utilityAccount, narrative, currencyCode, sourceMobile, targetMobile, transmissionDate } = data.data;
+
+                                        //  save the airtime transaction in the database 
+                                        new Airtime({
+                                            orderNumber: nanoid(10),
+                                            vendorReference: vendorReference,
+                                            type: "econet",
+                                            amount: transactionAmount / 100,
+                                            status: "success",
+                                            utilityAccount: utilityAccount,
+                                            narrative: narrative,
+                                            currencyCode, currencyCode,
+                                            sourceMobile: sourceMobile,
+                                            targetMobile: targetMobile,
+                                            date: transmissionDate
+                                        })
+                                            .save()
+                                            .then(() => {
+                                                //  send SMS to client using Twilio
+
+                                                console.log('..................', targetMobile)
+                                                sendSMS(`${targetMobile}`, data.data)
+                                            })
+
+                                        res.send(data.data)
+                                    }
                                 })
-                            } else {
-                                // save transaction in the database and  send an sms to 
-                                // the client with the credited amount and the client final balance after airtime purchase
 
-                                const { vendorReference, transactionAmount, utilityAccount, narrative, currencyCode, sourceMobile, targetMobile, transmissionDate } = data.data;
-
-                                //  save the airtime transaction in the database 
-                                new Airtime({
-                                    orderNumber: nanoid(10),
-                                    vendorReference: vendorReference,
-                                    type: "telecel",
-                                    amount: transactionAmount / 100,
-                                    status: "success",
-                                    utilityAccount: utilityAccount,
-                                    narrative: narrative,
-                                    currencyCode, currencyCode,
-                                    sourceMobile: sourceMobile,
-                                    targetMobile: targetMobile,
-                                    date: transmissionDate
-                                })
-                                    .save()
-                                    .then(() => {
-                                        //  send SMS to client using Twilio
-                                        sendSMS(`+${targetMobile}`, data.data)
-                                    })
-
-                                res.send(data.data)
-                            }
+                        }
+                    } else {
+                        return res.json({
+                            error: 'err01',
+                            message: "Failed to make ecocash transaction"
                         })
+                    }
 
-
-
-
-                } else {
-                    res.send('Failed to make ecocash transaction')
-                }
-            })
-
+                })
+            } else {
+                return res.json({
+                    error: 'err01',
+                    message: "Invalid ecocash Number"
+                })
+            }
         } else {
-            res.send("Invalid ecocash Number");
+            return res.json({
+                error: 'err01',
+                message: "Invalid telecel Number  on target mobile"
+            })
         }
+
 
     }
 

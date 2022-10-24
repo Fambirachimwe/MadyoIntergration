@@ -1,9 +1,43 @@
-// import axios from "axios";
+import axios from "axios";
+import { nanoid } from "nanoid";
 // instance of axios 
-import axios from '../util/axios.js'
+// import axios from '../util/axios.js'
 import Zesa from "../models/zesa.js";
 import { testVendorNumber } from "../util/constants.js";
 import { failedZesaToken, generateZesaVendorRefence, sendZesaToken, tokenResend, nowDate, mobilePay } from "../util/util.js";
+import { load } from 'cheerio';
+
+
+var my_status;
+
+const getTransactioStatus = async (_polUrl) => {
+    const response = await axios.get(_polUrl);
+    const $ = load(response.data);
+    const splited = $('body').text().split('&')
+    let reference, paynowReference, amount, status, polUrl, hash;
+
+    reference = splited[0].split('=')[1].replaceAll('%', ' ');
+    paynowReference = splited[1].split('=')[1].replaceAll('%', ' ');
+    amount = splited[2].split('=')[1].replaceAll('%', ' ');
+    status = splited[3].split('=')[1].replaceAll('%', ' ');
+    polUrl = splited[4].split('=')[1].replaceAll('%', ' ');
+    hash = splited[5].split('=')[1].replaceAll('%', ' ');
+
+    if (status === "Sent") {
+        my_status = status;
+        console.log(status)
+
+        setTimeout(() => {
+            getTransactioStatus(_polUrl)
+        }, 5000);
+
+    } else {
+
+        console.log('chage the status', status);
+        my_status = status;
+        // return transactionStatus;
+    }
+}
 
 
 const url = process.env.BASE_URL;
@@ -46,76 +80,112 @@ export const getCustomer = (req, res, next) => {
 
 export const buyToken = (req, res, next) => {
 
-    const { amount, meterNumber, phoneNumber, method } = req.body;  // the phone number is the paying phoneNumber on the frontend t
+    const { amount, meterNumber, phoneNumber } = req.body;  // the phone number is the paying phoneNumber on the frontend t
 
     // 41234567890  demo meterNumber
     const cents = amount * 100;
-    // console.log(phoneNumber)
+    // console.log(amount)
 
     // make mobile payment here  using paynow
-    mobilePay(amount, method, phoneNumber).then((response) => {
+    mobilePay(amount, 'ecocash', phoneNumber).then(async (response) => {
 
-
+        // TODO: safe the payment in the database 
 
         if (response && response.success) {
+            while (my_status === "Sent" || my_status === undefined) {
+                await getTransactioStatus(response.pollUrl);
+            }
 
-            axios.post(`${url}`,
-                //  pass this data in the body of the api 
-                {
-                    "mti": "0200",
-                    "vendorReference": generateZesaVendorRefence(),
-                    "processingCode": "U50000",
-                    "transactionAmount": cents,
-                    // "amount": 60000,  
-                    "transmissionDate": nowDate(),
-                    "vendorNumber": testVendorNumber,  // replace this with the offical vendor number
-                    "terminalID": "POS001",
-                    "merchantName": "ZETDC",
-                    "utilityAccount": meterNumber,  // this is the meter number of the customer 
-                    "aggregator": "POWERTEL",
-                    "productName": "ZETDC_PREPAID",
-                    "currencyCode": "ZWL"
-                },
-                // auth object
+            if (my_status === "Cancelled") {
 
-                {
-                    auth: {
-                        username: process.env.API_USERNAME,
-                        password: process.env.API_PASSWORD
+                return res.json({
+                    error: 'err01',
+                    message: "Ecocash confirmation failed"
+                })
+            }
+
+            else if (my_status === "Paid") {
+                axios.post(`${url}`,
+                    //  pass this data in the body of the api 
+                    {
+                        "mti": "0200",
+                        "vendorReference": generateZesaVendorRefence(),
+                        "processingCode": "U50000",
+                        "transactionAmount": cents,
+                        // "amount": 60000,  
+                        "transmissionDate": nowDate(),
+                        "vendorNumber": testVendorNumber,  // replace this with the offical vendor number
+                        "terminalID": "POS001",
+                        "merchantName": "ZETDC",
+                        "utilityAccount": meterNumber,  // this is the meter number of the customer 
+                        "aggregator": "POWERTEL",
+                        "productName": "ZETDC_PREPAID",
+                        "currencyCode": "ZWL"
+                    },
+                    // auth object
+
+                    {
+                        auth: {
+                            username: process.env.API_USERNAME,
+                            password: process.env.API_PASSWORD
+                        }
                     }
-                }
 
-            ).then(data => {
-                // res.send(data.data)
-                // console.log(data.data)
+                ).then(data => {
+                    // res.send(data.data)
+                    // console.log('the response code ', data.data.responseCode)
+                    const code = data.data.responseCode;
 
-                switch (data.data.reponseCode) {
+                    switch (code) {
 
-                    case "00":
-                        new Zesa({ ...data.data, orderNumber: nanoid(10) })
-                            .save()
-                            .then(saved_data => {
-                                console.log('saved into the database ', saved_data);
-                                sendZesaToken(phoneNumber, saved_data.token);
+                        case "00":
+                            new Zesa({ ...data.data, orderNumber: nanoid(10) })
+                                .save()
+                                .then(saved_data => {
+                                    console.log('saved into the database ', saved_data);
+                                    sendZesaToken(phoneNumber, saved_data.token);
+                                });
+
+                            res.json({
+                                message: data.data.narrative,
+                                data: data.data,
+                                code: "00"
                             })
-                        res.send(data.data)
-                        break
 
-                    case "09":
-                        setTimeout(() => {
-                            console.log('token resend')
+                            break
+
+                        case "09":
+                            console.log('token resend');
+                            // set a timeout here to resend token purchase request
+
+                            // res.send(data.data)
                             tokenResend(data.data).then(result => {
+                                console.log('into token resend......')
 
-                                if (result.data.responseCode !== "00") {
+                                if (result.data.responseCode === "09") {
+                                    // TODO: save the failed transaction in the database 
+                                    // console.log(result.data)
+                                    new Zesa({ ...data.data, orderNumber: nanoid(10) })
+                                        .save()
+                                        .then(saved_data => {
 
-                                    console.log('failed to purchase zesa token , please return the money via ecocash')
-                                    // TODO: send a failed zesa token sms
+                                            // console.log(phoneNumber)
+                                            console.log('saved failed token into the database ............. ');
+                                            // failedZesaToken(phoneNumber, "token puchase in progress.. you will receive a message in short while");
+                                            res.json({
+                                                message: "Token purchase still in progress",
+                                                request: saved_data,
+                                                error: "err01",
+                                                code: "09"
+                                            })
 
 
+                                        })
 
-                                    // TODO: return the money to the user via ecocash
 
-                                } else {
+                                }
+
+                                else if (result.data.responseCode === "00") {
 
                                     // save into the database 
                                     new Zesa({ ...data.data, orderNumber: nanoid(10) })
@@ -123,32 +193,53 @@ export const buyToken = (req, res, next) => {
                                         .then(saved_data => {
                                             console.log('saved into the database ', saved_data);
                                             sendZesaToken(phoneNumber, saved_data.token);
-                                        })
+                                        });
+
+                                    res.json({
+                                        message: "Token purchase successfull",
+                                        reponse: saved_data,
+                                        code: "00"
+
+                                    })
                                 }
 
                             })
-                        }, 6000);  // timeout to resend the token purchase request
+                            // timeout to resend the token purchase request
 
-                        break;
+                            break;
 
-                    case "05":
-                        // send the response to the frontend 
-                        res.json({
-                            message: "Error",
-                            payload: data.data
-                        })
+                        case "05":
+                            // send the response to the frontend 
+                            console.log(data.data.narrative)
+                            res.json({
+                                message: data.data.narrative,
+                                payload: data.data,
+                                error: "err01",
+                                code: "05"
+                            })
 
-                    default:
-                        break;
-                }
+                            break;
+
+                        default:
+                            break;
+                    }
 
 
-            })
-        } else {
+                })
+
+            }
+
+
+
+
+        }
+
+        else {
             // send an error response
             res.json({
                 message: "Error, failed to deduct money from ecocash account",
-                description: data.data
+                // description: data.data
+                error: "err01"
             })
         }
 

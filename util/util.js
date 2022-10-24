@@ -6,7 +6,13 @@ import 'dotenv/config';
 import { Paynow } from 'paynow';
 import { nanoid } from 'nanoid';
 
-let paynow = new Paynow(process.env.testId, process.env.testIntergrationKey);
+//     DEMO-MADYO-ID="15385"
+// DEMO-MADYO-KEY=f45c34a6-d855-46c0-8daf-c933cbc7e426
+
+// paynowliveId="15376"
+// paynowliveKey=b6f717b5-27e0-4e7f-914a-41cce7b7f46b
+
+let paynow = new Paynow(process.env.paynowliveId, process.env.paynowliveKey);
 
 
 
@@ -104,7 +110,7 @@ export const sendSMS = async (to, data) => {
             Airtime Credited,  ${data ? `New Balance ${data.finalBalance}` : "please check you balance"}
             `,
             from: "+12059278608",
-            to: `${to}`
+            to: `+${to}`
         }
         ).then(() => {
             console.log('message sent')
@@ -140,6 +146,8 @@ export const sendZesaToken = async (to, data) => {
 
 export const failedZesaToken = async (to, data) => {
 
+
+
     const accountSid = process.env.TWILIO_ACCOUNT_SID;
     const authToken = process.env.TWILIO_AUTH_TOKEN;
     const client = new Twilio(accountSid, authToken);
@@ -149,10 +157,10 @@ export const failedZesaToken = async (to, data) => {
         .create({
             body: `${data}`,
             from: "+12059278608",
-            to: `+263${to}`
+            to: `+${to}`
         }
         ).then(() => {
-            console.log('message sent')
+            console.log('failed token message sent')
 
         }
         )
@@ -191,27 +199,37 @@ export const tokenResend = (data) => {
 
 
 
-export const mobilePay = async (amount, method, customerPhoneNumber) => {
-
+export const mobilePay = (amount, method, customerPhoneNumber) => {
 
     const invoiceNumber = nanoid(5);
-    paynow.resultUrl = "http://example.com/gateways/paynow/update";
+    paynow.resultUrl = "http://localhost:5500/result.html";
     paynow.returnUrl = "http://example.com/return?gateway=paynow&merchantReference=1234";
 
     let payment = paynow.createPayment(invoiceNumber, process.env.AUTH_EMAIL)
     payment.add('bill-payment', amount);
 
-    return await paynow.sendMobile(
+    // console.log(amount)
+
+    return paynow.sendMobile(
         payment,
         // The phone number making payment
-        '0771111111',  // this is a test phone number
+        // '0771111111',  // this is a test phone number
 
-        // `0${customerPhoneNumber}`,
+
+        `0${customerPhoneNumber}`,
         // The mobile money method to use.  ecocash, onemoney, telecel
 
-        // `${method}`
-        'ecocash'
+        `${method}`
+        // 'ecocash'
 
     )
 
+
+
+}
+
+// TODO: save the payment  to the database  
+
+export const savePaymentToDatabase = (data) => {
+    // save the data in the database 
 }
