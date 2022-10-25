@@ -72,9 +72,10 @@ export const netoneAirtimeController = (req, res, next) => {
                 mobilePay(amount, 'ecocash', `0${payingNumber.slice(3)}`).then(async response => {
 
                     if (response && response.success) {
-                        while (my_status === "Sent" || my_status === undefined) {
+                        do {
                             await getTransactioStatus(response.pollUrl);
-                        }
+                        } while (my_status === "Sent" || my_status === undefined);
+
 
                         if (my_status === "Cancelled") {
 

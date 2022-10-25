@@ -69,9 +69,13 @@ export const econetAirtimeController = async (req, res, next) => {
             mobilePay(amount, 'ecocash', `0${payingNumber.slice(3)}`).then(async response => {
 
                 if (response && response.success) {
-                    while (my_status === "Sent" || my_status === undefined) {
+                    // while (my_status === "Sent" || my_status === undefined) {
+
+                    // } 
+
+                    do {
                         await getTransactioStatus(response.pollUrl);
-                    }
+                    } while (my_status === "Sent" || my_status === undefined);
 
                     if (my_status === "Cancelled") {
 
@@ -114,7 +118,7 @@ export const econetAirtimeController = async (req, res, next) => {
 
                                     // res.send(data.data)
                                     console.log("General Error.. response code 05")
-                                    res.json({
+                                    return res.json({
                                         error: "err01",
                                         message: data.data.narrative,
                                         description: data.data
@@ -147,7 +151,7 @@ export const econetAirtimeController = async (req, res, next) => {
                                             sendSMS(`${targetMobile}`, data.data)
                                         })
 
-                                    res.send(data.data)
+                                    return res.send(data.data)
                                 }
                             })
 
