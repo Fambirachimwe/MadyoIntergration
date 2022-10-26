@@ -7,7 +7,7 @@ import zesaRoutes from './routes/zesa.js';
 import dstvRoutes from './routes/dstv.js'
 import airTimeRoutes from './routes/airtime.js';
 import mongoose from "mongoose";
-
+import path from 'path';
 
 // connection to mongoDB
 //'mongodb://localhost/Madyozw'
@@ -17,6 +17,7 @@ mongoose.connection.once('open', () => {
 }).on('error', (error) => {
     console.log('connection error ', error);
 });
+
 
 
 
@@ -30,6 +31,10 @@ app.use(express.static('public'))
 
 
 //  routes
+
+app.get('/', (req, res, next) => {
+    res.sendFile(path.join(__dirname, '/index.html'));
+})
 
 app.use('/vendor', vendorRoutes);
 app.use('/zesa', zesaRoutes);
