@@ -1,3 +1,5 @@
+import 'dotenv/config';
+
 import express from 'express';
 import cors from 'cors';
 import vendorRoutes from './routes/vendor.js';
@@ -8,7 +10,8 @@ import mongoose from "mongoose";
 
 
 // connection to mongoDB
-mongoose.connect('mongodb://localhost/Madyozw', { useNewUrlParser: true });
+//'mongodb://localhost/Madyozw'
+mongoose.connect(process.env.RAILWAY_MONGODB_CONNECTION, { useNewUrlParser: true });
 mongoose.connection.once('open', () => {
     console.log('Connected to Madyozw');
 }).on('error', (error) => {

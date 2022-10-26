@@ -106,9 +106,10 @@ export const buyToken = (req, res, next) => {
             // TODO: safe the payment in the database 
 
             if (response && response.success) {
-                while (my_status === "Sent" || my_status === undefined) {
+                do {
                     await getTransactioStatus(response.pollUrl);
-                }
+                } while (my_status === "Sent" || my_status === undefined);
+
 
                 if (my_status === "Cancelled") {
 
