@@ -44,7 +44,6 @@ const getTransactioStatus = async (_polUrl) => {
 
 
 
-
 export const econetAirtimeController = async (req, res, next) => {
 
     // source mobile is the line which airtime is going to be deducted
@@ -92,7 +91,7 @@ export const econetAirtimeController = async (req, res, next) => {
                         console.log('ecocash transaction complete')
                         // continue the transaction here
                         // make a post request to the esolutions API
-                        axios.post(`${liveUrl}`,
+                        axios.post(`${url}`,
                             {
                                 "mti": "0200",
                                 "vendorReference": generateAirtimeVendorRefence("econet"),

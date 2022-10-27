@@ -13,13 +13,8 @@ import { load } from 'cheerio';
 // paynowliveId="15376"
 // paynowliveKey=b6f717b5-27e0-4e7f-914a-41cce7b7f46b
 
-
-
-
 // madyoLiveZWId="9760"
 // madyoLiveZWKey=dfc4c049-e923-462b-8962-79457c7c26c1
-
-
 
 
 let paynow = new Paynow(process.env.madyoLiveZWId, process.env.madyoLiveZWKey);
