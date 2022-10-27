@@ -29,7 +29,8 @@ const airTimeSchema = new Schema({
     currencyCode: String,
     sourceMobile: String,
     targetMobile: String,  // number to send airtime to .. same as the utility account
-    date: String
+    date: String,
+    channel: String
 
 });
 

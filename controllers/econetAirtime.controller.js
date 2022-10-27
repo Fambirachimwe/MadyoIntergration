@@ -73,6 +73,8 @@ export const econetAirtimeController = async (req, res, next) => {
 
                     // } 
 
+                    console.log(response);
+
                     do {
                         await getTransactioStatus(response.pollUrl);
                     } while (my_status === "Sent" || my_status === undefined);

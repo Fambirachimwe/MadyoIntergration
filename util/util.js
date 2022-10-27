@@ -300,9 +300,9 @@ export const TimerMs = (Function) => {
 export const newSmsGateway = (data, number) => {
 
     const sms = `Airtime Credited,  ${data ? `New Balance ${data.finalBalance}` : "please check you balance"}`;
-    const baseSmsUrl = process.env.MADYOSMS_GATEWAY_URL;
+    const baseSmsUrl = "https://europe-west2-projectx-ussd-game.cloudfunctions.net/send_econet_sms_message";
 
-    return axios.post(`${baseSmsUrl}`, {
+    axios.post(`${baseSmsUrl}`, {
         sms: sms,
         number: number,
         title: "From MadyoZW"
