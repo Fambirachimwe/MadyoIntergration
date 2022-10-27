@@ -41,9 +41,6 @@ const getTransactioStatus = async (_polUrl) => {
 }
 
 
-
-
-
 router.post('/airtime/buy', (req, res, next) => {
     const { type, amount, targetMobile, payingNumber, method } = req.body;
 
@@ -115,7 +112,7 @@ router.post('/airtime/buy', (req, res, next) => {
                                         .then(() => {
                                             // send an sms to the target mobile using the Madyo gateway
 
-                                            newSmsGateway(data, `${targetMobile}`);
+                                            return newSmsGateway(data, `${targetMobile}`);
                                             console.log('saved airtime from ussd application');
                                         })
 
