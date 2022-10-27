@@ -83,7 +83,7 @@ export const getCustomer = (req, res, next) => {
 
 export const buyToken = (req, res, next) => {
 
-    const { amount, meterNumber, phoneNumber } = req.body;  // the phone number is the paying phoneNumber on the frontend t
+    const { amount, meterNumber, phoneNumber, payingNumber } = req.body;  // the phone number is the paying phoneNumber on the frontend t
 
     // 41234567890  demo meterNumber
     const cents = amount * 100;
@@ -101,7 +101,7 @@ export const buyToken = (req, res, next) => {
         // console.log(amount)
 
         // make mobile payment here  using paynow
-        mobilePay(amount, 'ecocash', phoneNumber).then(async (response) => {
+        mobilePay(amount, 'ecocash', `0${payingNumber.slice(3)}`).then(async (response) => {
 
             // TODO: safe the payment in the database 
 
@@ -113,11 +113,12 @@ export const buyToken = (req, res, next) => {
 
                 if (my_status === "Cancelled") {
 
+                    my_status = "";
                     return res.json({
                         error: 'err01',
                         message: "Ecocash confirmation failed"
                     });
-                    my_status = "";
+
                 }
 
                 else if (my_status === "Paid") {
@@ -171,62 +172,81 @@ export const buyToken = (req, res, next) => {
                                 break
 
                             case "09":
-                                console.log('token resend');
-                                // set a timeout here to resend token purchase request
+                                console.log('token resend after 60seconds');
+                                // TODO: set a timeout here to resend token purchase request
 
-                                // res.send(data.data)
-                                tokenResend(data.data).then(result => {
-                                    console.log('into token resend......')
+                                const _resend = () => {
+                                    tokenResend(data.data).then(result => {
+                                        console.log('into token resend......')
 
-                                    if (result.data.responseCode === "09") {
-                                        // TODO: save the failed transaction in the database 
-                                        // console.log(result.data)
-                                        new Zesa({ ...data.data, orderNumber: nanoid(10) })
-                                            .save()
-                                            .then(saved_data => {
+                                        if (result.data.responseCode === "09") {
+                                            // TODO: save the failed transaction in the database 
+                                            // console.log(result.data)
+                                            new Zesa({ ...data.data, orderNumber: nanoid(10) })
+                                                .save()
+                                                .then(saved_data => {
 
-                                                // console.log(phoneNumber)
-                                                console.log('saved failed token into the database ............. ');
-                                                // failedZesaToken(phoneNumber, "token puchase in progress.. you will receive a message in short while");
-                                                res.json({
-                                                    message: "Token purchase still in progress",
-                                                    request: saved_data,
-                                                    error: "err01",
-                                                    code: "09"
+                                                    // console.log(phoneNumber)
+                                                    console.log('saved failed token into the database ............. ');
+                                                    // failedZesaToken(phoneNumber, "token puchase in progress.. you will receive a message in short while");
+                                                    res.json({
+                                                        message: "Token purchase still in progress",
+                                                        request: saved_data,
+                                                        error: "err01",
+                                                        code: "09"
+                                                    })
+
+
                                                 })
 
 
+                                        }
+
+                                        else if (result.data.responseCode === "00") {
+
+                                            // save into the database 
+                                            new Zesa({ ...data.data, orderNumber: nanoid(10) })
+                                                .save()
+                                                .then(saved_data => {
+                                                    console.log('saved into the database ', saved_data);
+                                                    sendZesaToken(phoneNumber, saved_data.token);
+                                                });
+
+                                            res.json({
+                                                message: "Token purchase successfull",
+                                                reponse: saved_data,
+                                                code: "00"
+
                                             })
+                                        }
 
+                                    });
+                                }
 
-                                    }
-
-                                    else if (result.data.responseCode === "00") {
-
-                                        // save into the database 
-                                        new Zesa({ ...data.data, orderNumber: nanoid(10) })
-                                            .save()
-                                            .then(saved_data => {
-                                                console.log('saved into the database ', saved_data);
-                                                sendZesaToken(phoneNumber, saved_data.token);
-                                            });
-
-                                        res.json({
-                                            message: "Token purchase successfull",
-                                            reponse: saved_data,
-                                            code: "00"
-
-                                        })
-                                    }
-
+                                res.json({
+                                    code: "09",
+                                    message: "transaction still in progress"
                                 })
+
+
+                                setTimeout(() => {
+                                    _resend();
+
+                                }, 60000);
+
                                 // timeout to resend the token purchase request
 
                                 break;
 
                             case "05":
                                 // send the response to the frontend 
-                                console.log(data.data.narrative)
+                                console.log(data.data.narrative);
+                                new Zesa({ ...data.data, orderNumber: nanoid(10) })
+                                    .save()
+                                    .then(saved_data => {
+                                        console.log('saved failed request into the database ', saved_data);
+                                        sendZesaToken(phoneNumber, saved_data.token);
+                                    });
                                 res.json({
                                     message: data.data.narrative,
                                     payload: data.data,

@@ -1,8 +1,8 @@
 <?php
 /*
-Plugin Name: ZESA Tokens Multistep Form
+Plugin Name: Dstv Form
 Plugin URI: http://example.com
-Description: Multistep Form
+Description: Dstv Recharge
 Version: 1.0
 Author: Tatenda Fambirachimwe
 Author URI: https://tatenda-fambirachimwe.web.app/
@@ -11,7 +11,7 @@ Author URI: https://tatenda-fambirachimwe.web.app/
 
 
 
-function ZesaForm(){
+function dstvForm(){
 
     echo '<div id="loader"></div>';
     echo '
@@ -19,7 +19,7 @@ function ZesaForm(){
     <div class="container border rounded">
 
         
-        <form id="zesa_form">
+        <form id="dstv_form">
                 <fieldset>
                 <h2>Step 1: </h2>
 
@@ -68,8 +68,8 @@ function ZesaForm(){
                         </tr>
                         <tr>
                         <th scope="row">4</th>
-                        <td >Meter Number</td>
-                        <td id="meterNumber"></td>
+                        <td >Utility Account Number</td>
+                        <td id="utilityAccount"></td>
                         </tr>
                     </tbody>
                 </table>
@@ -105,7 +105,7 @@ function ZesaForm(){
 
 
 
-function ZesaformJs (){
+function dstvformJs (){
     echo'
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
@@ -147,7 +147,7 @@ function ZesaformJs (){
             $("#_submit").click(function(event){
                 event.preventDefault();
                 var type = $("#cf-type").val();
-                var baseUrl = "http://localhost:5500/zesa/buyToken";
+                var baseUrl = "http://localhost:5500/dstv/pay";
                 
 
 
@@ -204,7 +204,7 @@ function ZesaformJs (){
     </script>';
 }
 
-function getCustomer(){
+function getCustomerDstv(){
     echo '
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
@@ -222,7 +222,7 @@ function getCustomer(){
 
         $(document).ready(function(){
 
-            var getCustomerUrl = "http://localhost:5500/zesa/getCustomer";
+            var getCustomerUrl = "http://localhost:5500/dstv/getCustomer";
 
             
 
@@ -281,9 +281,9 @@ function getCustomer(){
 
 
 
-function ZesaformStyles(){
+function DstvformStyles(){
     echo '<style type="text/css">
-	#zesa_form fieldset:not(:first-of-type) {
+	#dstv_form fieldset:not(:first-of-type) {
 		display: none;
 	}
 
@@ -312,11 +312,11 @@ function ZesaformStyles(){
 
 
 
-function Zesacf_sCode() {
+function dstvcf_sCode() {
 	ob_start();
-	ZesaformStyles();
-	ZesaForm();
-    ZesaformJs();
+	dstvformStyles();
+	dstvForm();
+    dstvformJs();
     getCustomer();
 
 	return ob_get_clean();
@@ -324,7 +324,7 @@ function Zesacf_sCode() {
 
 
 
-add_shortcode( 'Zesa_multiStep_form', 'Zesacf_sCode' );
+add_shortcode( 'dstv_multiStep_form', 'dstvcf_sCode' );
 
 
 

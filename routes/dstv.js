@@ -1,27 +1,33 @@
 import 'dotenv/config';
 import express from 'express';
 import axios from 'axios';
-import { nowDate, my_status, getTransactioStatus } from '../util/util.js';
+import { nowDate, getTransactioStatus } from '../util/util.js';
 import Dstv from '../models/dstv.js';
 import { nanoid } from 'nanoid';
 
 const router = express.Router();
 const url = process.env.BASE_URL;
 
+var my_status = ""
+
 // Sample Customer Information Request
 router.post(`/getCustomer`, (req, res, next) => {
+
+
+    const { utilityAccount } = req.body;
+
     axios.post(`${url}`,
 
         //  pass this data in the body of the api 
         {
             "mti": "0200",
-            "vendorReference": "031423091351",
+            "vendorReference": "031423091352",  // 
             "processingCode": "310000",
-            "transmissionDate": "30920081415",
+            "transmissionDate": nowDate(),
             "vendorNumber": "VE19217695801",
             "merchantName": "DSTV",
             "productName": "DSTV",
-            "utilityAccount": "0501000608"
+            "utilityAccount": utilityAccount
         },
         // auth object
 
@@ -54,9 +60,10 @@ router.post(`/pay`, (req, res, next) => {
         .then(async response => {
             if (response && response.success) {
 
-                while (my_status === "Sent" || my_status === undefined) {
+                do {
                     await getTransactioStatus(response.pollUrl);
-                }
+                } while (my_status === "Sent" || my_status === undefined);
+
 
                 if (my_status === "Cancelled") {
                     my_status = "";

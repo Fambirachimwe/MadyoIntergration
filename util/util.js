@@ -13,7 +13,16 @@ import { load } from 'cheerio';
 // paynowliveId="15376"
 // paynowliveKey=b6f717b5-27e0-4e7f-914a-41cce7b7f46b
 
-let paynow = new Paynow(process.env.paynowliveId, process.env.paynowliveKey);
+
+
+
+// madyoLiveZWId="9760"
+// madyoLiveZWKey=dfc4c049-e923-462b-8962-79457c7c26c1
+
+
+
+
+let paynow = new Paynow(process.env.madyoLiveZWId, process.env.madyoLiveZWKey);
 
 
 
@@ -263,4 +272,25 @@ export const mobilePay = (amount, method, customerPhoneNumber) => {
 
 export const savePaymentToDatabase = (data) => {
     // save the data in the database 
+}
+
+// TODO: add the setTimeOut function
+// auto increment timer
+
+export const TimerMs = (Function) => {
+    const t1 = 60000;
+    let _data;
+    setTimeout(() => {
+        Function.then(data => {
+            if (data.data.responseCode === "09") {
+                Timer(Function);
+            } else if (data.data.responseCode === "00") {
+                _data = data.data;
+
+            }
+        })
+    }, t1);
+
+    return _data;
+
 }

@@ -11,7 +11,8 @@ import path from 'path';
 
 // connection to mongoDB
 //'mongodb://localhost/Madyozw'
-mongoose.connect(process.env.RAILWAY_MONGODB_CONNECTION, { useNewUrlParser: true });
+// process.env.RAILWAY_MONGODB_CONNECTION
+mongoose.connect('mongodb://localhost/Madyozw', { useNewUrlParser: true });
 mongoose.connection.once('open', () => {
     console.log('Connected to Madyozw');
 }).on('error', (error) => {
