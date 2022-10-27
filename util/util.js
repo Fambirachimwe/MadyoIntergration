@@ -113,7 +113,7 @@ export const sendSMS = async (to, data) => {
     const client = new Twilio(accountSid, authToken);
     // const accountNumber = process.env.TWILIO_TEST_NUMBER
 
-    console.log(to)
+    // console.log(to)
     client.messages
         .create({
             body: `
@@ -292,5 +292,21 @@ export const TimerMs = (Function) => {
     }, t1);
 
     return _data;
+
+}
+
+// SMS Gate
+
+export const newSmsGateway = (data, number) => {
+
+    const sms = `Airtime Credited,  ${data ? `New Balance ${data.finalBalance}` : "please check you balance"}`;
+    const baseSmsUrl = process.env.MADYOSMS_GATEWAY_URL;
+
+    return axios.post(`${baseSmsUrl}`, {
+        sms: sms,
+        number: number,
+        title: "From MadyoZW"
+    });
+
 
 }

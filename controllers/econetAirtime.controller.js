@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { generateAirtimeVendorRefence, nowDate, sendSMS, mobilePay } from '../util/util.js'
+import { generateAirtimeVendorRefence, nowDate, sendSMS, mobilePay, newSmsGateway } from '../util/util.js'
 import Airtime from '../models/airtime.js';
 import { vendorNumbers } from '../util/constants.js'
 import { nanoid } from 'nanoid';
@@ -148,7 +148,9 @@ export const econetAirtimeController = async (req, res, next) => {
                                             //  send SMS to client using Twilio
 
                                             console.log('..................', targetMobile)
-                                            sendSMS(`${targetMobile}`, data.data)
+                                            // sendSMS(`${targetMobile}`, data.data)
+                                            // using the Madyo sms gateway
+                                            newSmsGateway(data, `${targetMobile}`)
                                         })
 
                                     return res.send(data.data)
