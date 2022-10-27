@@ -102,7 +102,7 @@ export const buyToken = (req, res, next) => {
 
         // make mobile payment here  using paynow
         mobilePay(amount, 'ecocash', `0${payingNumber.slice(3)}`).then(async (response) => {
-
+            payingNumber
             // TODO: safe the payment in the database 
 
             if (response && response.success) {
