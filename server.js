@@ -13,7 +13,7 @@ import usssdRoutes from './routes/ussd.js';
 // connection to mongoDB
 //'mongodb://localhost/Madyozw'
 // process.env.RAILWAY_MONGODB_CONNECTION
-mongoose.connect('mongodb://localhost/Madyozw', { useNewUrlParser: true });
+mongoose.connect(`${process.env.RAILWAY_MONGODB_CONNECTION}`, { useNewUrlParser: true });
 mongoose.connection.once('open', () => {
     console.log('Connected to Madyozw');
 }).on('error', (error) => {

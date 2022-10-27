@@ -7,6 +7,7 @@ import { load } from 'cheerio';
 
 
 const url = process.env.BASE_URL;
+const liveUrl = process.env.LIVE_API_URL;
 // this is our source  account phonenumber .... represents us as the merchant
 const econetSouceMobile = "263772978751";
 
@@ -91,7 +92,7 @@ export const econetAirtimeController = async (req, res, next) => {
                         console.log('ecocash transaction complete')
                         // continue the transaction here
                         // make a post request to the esolutions API
-                        axios.post(`${url}`,
+                        axios.post(`${liveUrl}`,
                             {
                                 "mti": "0200",
                                 "vendorReference": generateAirtimeVendorRefence("econet"),

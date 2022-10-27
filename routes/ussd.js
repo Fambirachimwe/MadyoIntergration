@@ -4,10 +4,12 @@ import { generateAirtimeVendorRefence, nowDate, sendSMS, mobilePay, newSmsGatewa
 import Airtime from '../models/airtime.js';
 import express from "express";
 import { vendorNumbers } from '../util/constants.js';
+import { load } from 'cheerio';
 
 const router = express.Router();
 
 var my_status;
+const url = process.env.BASE_URL;
 
 const getTransactioStatus = async (_polUrl) => {
     const response = await axios.get(_polUrl);
@@ -73,8 +75,8 @@ router.post('/airtime/buy', (req, res, next) => {
                                     "vendorReference": generateAirtimeVendorRefence("econet"),
                                     "processingCode": "U50000",
                                     "vendorNumber": vendorNumbers.econet,
-                                    "transactionAmount": cents,
-                                    "sourceMobile": econetSouceMobile,
+                                    "transactionAmount": amount * 100,
+                                    "sourceMobile": "263782824073",
                                     "targetMobile": targetMobile,
                                     "utilityAccount": targetMobile,
                                     "merchantName": "ECONET",
