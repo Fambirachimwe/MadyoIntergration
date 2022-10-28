@@ -152,7 +152,7 @@ export const econetAirtimeController = async (req, res, next) => {
                                             console.log('..................', targetMobile)
                                             // sendSMS(`${targetMobile}`, data.data)
                                             // using the Madyo sms gateway
-                                            newSmsGateway(data, `${targetMobile}`)
+                                            newSmsGateway(data, transactionAmount, `${targetMobile}`)
                                         })
 
                                     return res.send(data.data)

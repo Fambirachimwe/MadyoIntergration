@@ -300,9 +300,9 @@ export const TimerMs = (Function) => {
 
 // SMS Gate
 
-export const newSmsGateway = (data, number) => {
+export const newSmsGateway = (data, transactionAmount, number) => {
 
-    const sms = `Airtime Credited,  ${data ? `New Balance ${data.finalBalance}` : "please check you balance"}`;
+    const sms = `Airtime Credited with ${transactionAmount}`;
     const baseSmsUrl = "https://europe-west2-projectx-ussd-game.cloudfunctions.net/send_econet_sms_message";
 
     axios.post(`${baseSmsUrl}`, {
