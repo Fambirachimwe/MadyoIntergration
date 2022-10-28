@@ -10,7 +10,7 @@ import mongoose from "mongoose";
 import path from 'path';
 import usssdRoutes from './routes/ussd.js';
 import lifeAssuranceRoutes from './routes/lifeAssurance.js';
-
+import peseRoute from './routes/pesepayRoute.js';
 
 
 // connection to mongoDB
@@ -46,7 +46,8 @@ app.use('/zesa', zesaRoutes);
 app.use('/dstv', dstvRoutes);
 app.use('/airtime', airTimeRoutes);
 app.use('/ussd', usssdRoutes);
-app.use('/lifeAssurrence', lifeAssuranceRoutes)
+app.use('/lifeAssurrence', lifeAssuranceRoutes);
+app.use('/testPese', peseRoute)
 
 
 
