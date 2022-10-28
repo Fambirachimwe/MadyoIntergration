@@ -131,7 +131,7 @@ export const buyToken = (req, res, next) => {
                             "transactionAmount": cents,
                             // "amount": 60000,  
                             "transmissionDate": nowDate(),
-                            "vendorNumber": testVendorNumber,  // replace this with the offical vendor number
+                            "vendorNumber": vendorNumbers._liveVendorNumber,  // replace this with the offical vendor number
                             "terminalID": "POS001",
                             "merchantName": "ZETDC",
                             "utilityAccount": meterNumber,  // this is the meter number of the customer 
