@@ -3,6 +3,7 @@ import 'dotenv/config';
 import express from 'express';
 import axios from 'axios';
 import { generatePolicyVendorRefence } from '../util/util.js'
+import { vendorNumbers } from '../util/constants.js';
 
 const router = express.Router();
 
@@ -10,17 +11,30 @@ const router = express.Router();
 
 router.post('/getCustomer', (req, res, next) => {
 
+    const { mobileNumber, utilityAccount, policyType } = req.body;
+
+    let productName;
+    let merchantName;
+
+    if (policyType === "NYARADZO") {
+        productName = "NYARADZO";
+        merchantName = "NYARADZO"
+
+    } else {
+        productName
+    }
+
     axios.post(1, {
         "mti": "0200",
         "vendorReference": generatePolicyVendorRefence(),
         "processingCode": "310000",
         "vendorNumber": vendorNumbers.lifeAssurrance,
         "transactionAmount": 100,
-        "sourceMobile": "263772731006",
-        "utilityAccount": "nlaco001931", Number,
-        "productName": "NYARADZO",
+        "sourceMobile": mobileNumber,
+        "utilityAccount": utilityAccount,
+        "productName": policyType,
         "merchantName": "NYARADZO",
-        "transmissionDate": 91916182800,
+        "transmissionDate": nowDate(),
         "currencyCode": "ZWL"
     },
         {
