@@ -1,14 +1,43 @@
 import 'dotenv/config';
 import express from 'express';
 import axios from 'axios';
-import { nowDate, getTransactioStatus } from '../util/util.js';
+import { nowDate, mobilePay } from '../util/util.js';
 import Dstv from '../models/dstv.js';
 import { nanoid } from 'nanoid';
+import { load } from 'cheerio';
 
 const router = express.Router();
 const url = process.env.BASE_URL;
 
-var my_status = ""
+var my_status = "";
+const getTransactioStatus = async (_polUrl) => {
+    const response = await axios.get(_polUrl);
+    const $ = load(response.data);
+    const splited = $('body').text().split('&')
+    let reference, paynowReference, amount, status, polUrl, hash;
+
+    reference = splited[0].split('=')[1].replaceAll('%', ' ');
+    paynowReference = splited[1].split('=')[1].replaceAll('%', ' ');
+    amount = splited[2].split('=')[1].replaceAll('%', ' ');
+    status = splited[3].split('=')[1].replaceAll('%', ' ');
+    polUrl = splited[4].split('=')[1].replaceAll('%', ' ');
+    hash = splited[5].split('=')[1].replaceAll('%', ' ');
+
+    if (status === "Sent") {
+        my_status = status;
+        console.log(status)
+
+        setTimeout(() => {
+            getTransactioStatus(_polUrl)
+        }, 5000);
+
+    } else {
+
+        console.log('chage the status', status);
+        my_status = status;
+        // return transactionStatus;
+    }
+}
 
 // Sample Customer Information Request
 router.post(`/getCustomer`, (req, res, next) => {
@@ -54,9 +83,26 @@ router.post(`/pay`, (req, res, next) => {
 
     // the account is for the dstv serial card 
     // get the currency code either USD or ZWL
-    const { amount, payingNumber, utilityAccount, currency } = req.body;
+    const { amount, payingNumber, utilityAccount } = req.body;
 
-    mobilePay(amount, 'ecocash', `0${payingNumber.slice(3)}`)
+    // test the paying number here
+    let method;
+
+    const econetNumber = /^077|^078/;
+    const netoneNumber = /^071/;
+
+    if (econetNumber.test(`0${payingNumber.slice(3)}`)) {
+        method = "ecocash"
+    }
+
+    if (netoneNumber.test(`0${payingNumber.slice(3)}`)) {
+        method = "onemoney"
+    }
+
+
+
+
+    mobilePay(amount, `${method}`, `0${payingNumber.slice(3)}`)
         .then(async response => {
             if (response && response.success) {
 
@@ -66,17 +112,17 @@ router.post(`/pay`, (req, res, next) => {
 
 
                 if (my_status === "Cancelled") {
-                    my_status = "";
+                    // my_status = "";
 
-                    return res.json({
+                    res.json({
                         error: 'err01',
-                        message: "Ecocash confirmation failed"
+                        message: "Mobile Money confirmation failed"
                     });
 
                 }
 
                 else if (my_status === "Paid") {
-                    console.log('ecocash transaction complete');
+                    console.log('mobile money transaction complete');
                     my_status = ""; // reset the transaction status to null
                     const cents = amount * 100;
 
@@ -100,7 +146,7 @@ router.post(`/pay`, (req, res, next) => {
                             "merchantName": "DSTV",
                             "productName": "DSTV",
                             "transmissionDate": nowDate(),
-                            "currencyCode": currency
+                            "currencyCode": "ZWL"
                         },
                         // auth object
 

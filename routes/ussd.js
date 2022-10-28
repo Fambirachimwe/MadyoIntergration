@@ -142,5 +142,10 @@ router.post('/airtime/buy', (req, res, next) => {
 })
 
 
+router.post('/zesaTokens', (req, res, next) => {
+    res.send('buying tokens from the ussd application');
+});
+
+
 export default router;
 

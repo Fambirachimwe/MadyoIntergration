@@ -14,7 +14,7 @@ Author URI: https://tatenda-fambirachimwe.web.app/
 function dstvForm(){
 
     echo '<div id="loader"></div>';
-    ?>
+    echo '
    
     <div class="container border rounded">
 
@@ -101,14 +101,14 @@ function dstvForm(){
         </form>
   </div>
    
-    <?php
+    ';
 }
 
 
 
 
 function dstvformJs (){
-    ?>
+    echo '
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
 
@@ -205,11 +205,11 @@ function dstvformJs (){
         
     </script>';
 
-    <?php
+
 }
 
 function getCustomerDstv(){
-    ?>
+    echo '
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
 
@@ -277,17 +277,14 @@ function getCustomerDstv(){
 
     </script> ;
 
-    <?php
+    ';
 }
 
 
 
 
 function dstvformStyles(){
-
-
-    ?>
-    <style type="text/css">
+    echo '<style type="text/css">
 	#dstv_form fieldset:not(:first-of-type) {
 		display: none;
 	}
@@ -312,8 +309,7 @@ function dstvformStyles(){
     100% { transform: rotate(360deg); }
     }
 	
-  </style>;
-  <?php
+  </style>';
 }
 
 
