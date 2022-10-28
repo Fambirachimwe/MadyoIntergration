@@ -99,11 +99,15 @@ router.post(`/pay`, (req, res, next) => {
         method = "onemoney"
     }
 
+    console.log(method);
+
 
 
 
     mobilePay(amount, `${method}`, `0${payingNumber.slice(3)}`)
         .then(async response => {
+
+            console.log(response)
             if (response && response.success) {
 
                 do {
@@ -161,6 +165,8 @@ router.post(`/pay`, (req, res, next) => {
 
                     ).then(data => {
 
+                        console.log(data.data)
+
 
 
                         // check the response code
@@ -181,6 +187,8 @@ router.post(`/pay`, (req, res, next) => {
                                 })
 
                         }
+
+
 
                         // if 09  .. make a resend request using the data provided
                         // set timeout to 
