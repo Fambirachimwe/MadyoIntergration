@@ -206,7 +206,7 @@ router.post(`/pay`, (req, res, next) => {
                     error: 'err01',
                     message: "Failed to initiate ecocash transaction",
                     code: "05",
-                    response: response
+                    xxx: response
                 });
 
             }
