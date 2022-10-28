@@ -99,7 +99,7 @@ router.post(`/pay`, (req, res, next) => {
         method = "onemoney"
     }
 
-    console.log(method);
+    console.log('this is the method', method);
 
 
 
@@ -107,7 +107,7 @@ router.post(`/pay`, (req, res, next) => {
     mobilePay(amount, `${method}`, `0${payingNumber.slice(3)}`)
         .then(async response => {
 
-            console.log(response)
+            console.log("this is the response from mobile pay", response)
             if (response && response.success) {
 
                 do {
