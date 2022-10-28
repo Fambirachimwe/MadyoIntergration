@@ -111,6 +111,9 @@ export const buyToken = (req, res, next) => {
                 } while (my_status === "Sent" || my_status === undefined);
 
 
+                console.log(response);
+
+
                 if (my_status === "Cancelled") {
 
                     my_status = "";
