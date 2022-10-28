@@ -14,7 +14,7 @@ Author URI: https://tatenda-fambirachimwe.web.app/
 function dstvForm(){
 
     echo '<div id="loader"></div>';
-    echo '
+    ?>
    
     <div class="container border rounded">
 
@@ -24,8 +24,17 @@ function dstvForm(){
                 <h2>Step 1: </h2>
 
                 <div class="form-group">
-                    <label for="cf-meterNumber">Meter Number</label>
-                    <input required type="text" name="cf-meterNumber" class="form-control" id="cf-meterNumber" placeholder="Meter Number">
+                    <label for="cf-type">Select Package (required)</label><br/>
+                    <select name="cf-type" id="cf-type" value="">
+                        <option selected="selected" value="premium">Premium</option>
+                        <option value="compact_plus">Compact Plus</option>
+                        <option value="compact">Compact</option>
+                    </select><br /> 
+                </div>
+
+                <div class="form-group">
+                    <label for="cf-utilityAccount">Dstv Account</label>
+                    <input required type="text" name="cf-utilityAccount" class="form-control" id="cf-utilityAccount" placeholder="Meter Number">
                 </div>
                 
                 <div class="form-group">
@@ -33,10 +42,7 @@ function dstvForm(){
                     <input required type="text" class="form-control" id="cf-amount" placeholder="Amount">
                 </div>
 
-                <div class="form-group">
-                    <label for="cf-targetMobile">Mobile Number</label>
-                    <input required type="text" name="cf-targetMobile" class="form-control" id="cf-targetMobile" placeholder="Mobile Number">
-                </div>
+                
 
                 
                 <input type="button" id="step1_next" name="data[password]" class="next btn btn-info" value="Next" />
@@ -51,26 +57,22 @@ function dstvForm(){
                     <tbody>
                         <tr>
                         <th scope="row">1</th>
-                        <td>Customer Address</td>
+                        <td>Customer Data</td>
                         <td id="address"></td>
                     
                         </tr>
                         <tr>
                         <th scope="row">2</th>
-                        <td>Details</td>
-                        <td id="details"></td>
+                        <td>Utility Account</td>
+                        <td id="utility_account"></td>
                         
                         </tr>
                         <tr>
                         <th scope="row">3</th>
-                        <td >Amount</td>
-                        <td id="amount"></td>
+                        <td >Package</td>
+                        <td id="package"></td>
                         </tr>
-                        <tr>
-                        <th scope="row">4</th>
-                        <td >Utility Account Number</td>
-                        <td id="utilityAccount"></td>
-                        </tr>
+                        
                     </tbody>
                 </table>
 
@@ -82,10 +84,10 @@ function dstvForm(){
             </fieldset>
 
             <fieldset>
-                <h2> Step 3: Payment using Ecocash </h2>
+                <h2> Step 3: Payment using Ecocash or OneMoney </h2>
                 <div class="form-group">
-                    <label for="fName">Ecocash Number</label>
-                    <input type="text" required id="cf-payingNumber" class="form-control" name="data[fName]" id="fName" placeholder="Ecocash Number">
+                    <label for="fName">Ecocash or OneMoney Number</label>
+                    <input type="text" required id="cf-payingNumber" class="form-control" name="data[fName]" id="fName" placeholder="Ecocash Number or OneMoney  Number">
                 </div>
             
                 <input type="button" name="previous" class="previous btn btn-secondary" value="Previous" />
@@ -99,27 +101,27 @@ function dstvForm(){
         </form>
   </div>
    
-    ';
+    <?php
 }
 
 
 
 
 function dstvformJs (){
-    echo'
+    ?>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
 
     <script type="text/javascript">
 
-    $(document).ajaxStart(function(){
-        // Show image container
-        $("#loader").show();
-      });
-    $(document).ajaxComplete(function(){
-        // Hide image container
-        $("#loader").hide();
-    });
+        $(document).ajaxStart(function(){
+            // Show image container
+            $("#loader").show();
+        });
+        $(document).ajaxComplete(function(){
+            // Hide image container
+            $("#loader").hide();
+        });
 
         $(document).ready(function(){
             var current = 1,current_step,next_step,steps;
@@ -147,15 +149,15 @@ function dstvformJs (){
             $("#_submit").click(function(event){
                 event.preventDefault();
                 var type = $("#cf-type").val();
-                var baseUrl = "http://localhost:5500/dstv/pay";
+                var baseUrl = "https://madyointergration-production.up.railway.app/dstv/pay";
                 
 
 
                 var data = {
                     amount: $("#cf-amount").val(),
-                    targetMobile: $("#cf-targetMobile").val(),
+                    type: $("#cf-type").val(),
                     payingNumber: $("#cf-payingNumber").val(),
-                    meterNumber: $("#cf-meterNumber").val()
+                    utilityAccount: $("#cf-utilityAccount").val()
                 };
 
             
@@ -202,10 +204,12 @@ function dstvformJs (){
 
         
     </script>';
+
+    <?php
 }
 
 function getCustomerDstv(){
-    echo '
+    ?>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
 
@@ -222,7 +226,7 @@ function getCustomerDstv(){
 
         $(document).ready(function(){
 
-            var getCustomerUrl = "http://localhost:5500/dstv/getCustomer";
+            var getCustomerUrl = "https://madyointergration-production.up.railway.app/dstv/getCustomer";
 
             
 
@@ -271,18 +275,19 @@ function getCustomerDstv(){
         });
 
 
-    </script>
+    </script> ;
 
-
-
-    ';
+    <?php
 }
 
 
 
 
-function DstvformStyles(){
-    echo '<style type="text/css">
+function dstvformStyles(){
+
+
+    ?>
+    <style type="text/css">
 	#dstv_form fieldset:not(:first-of-type) {
 		display: none;
 	}
@@ -307,7 +312,8 @@ function DstvformStyles(){
     100% { transform: rotate(360deg); }
     }
 	
-  </style>';
+  </style>;
+  <?php
 }
 
 
@@ -317,7 +323,7 @@ function dstvcf_sCode() {
 	dstvformStyles();
 	dstvForm();
     dstvformJs();
-    getCustomer();
+    getCustomerDstv();
 
 	return ob_get_clean();
 }
