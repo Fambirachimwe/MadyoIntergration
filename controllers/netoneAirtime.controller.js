@@ -66,7 +66,7 @@ export const netoneAirtimeController = (req, res, next) => {
         const econet = /^077|^078/;
 
         if (netone.test(`0${targetMobile.slice(3)}`)) {
-            if (econet.test(`0${payingNumber.slice(3)}`)) {
+            if (netone.test(`0${payingNumber.slice(3)}`)) {
 
                 // first make payment using ecocash
                 mobilePay(amount, 'onemoney', `0${payingNumber.slice(3)}`).then(async response => {
