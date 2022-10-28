@@ -9,6 +9,9 @@ import airTimeRoutes from './routes/airtime.js';
 import mongoose from "mongoose";
 import path from 'path';
 import usssdRoutes from './routes/ussd.js';
+import lifeAssuranceRoutes from './routes/lifeAssurance.js';
+
+
 
 // connection to mongoDB
 //'mongodb://localhost/Madyozw'
@@ -43,6 +46,7 @@ app.use('/zesa', zesaRoutes);
 app.use('/dstv', dstvRoutes);
 app.use('/airtime', airTimeRoutes);
 app.use('/ussd', usssdRoutes);
+app.use('/lifeAssurrence', lifeAssuranceRoutes)
 
 
 

@@ -1,6 +1,8 @@
 import 'dotenv/config';
 import axios from "axios";
-import { nowDate } from "../util/util";
+import { nowDate } from "../util/util.js";
+import Dstv from '../models/dstv.js';
+import { nanoid } from 'nanoid';
 
 
 export const getCustomerControler = (req, res, next) => {

@@ -79,6 +79,14 @@ export const generateZesaVendorRefence = () => {
 }
 
 
+export const generatePolicyVendorRefence = () => {
+
+    let reference = 'LIFE';
+    const newRef = reference + randomString(16, 'aA')
+    return newRef;
+
+}
+
 
 
 

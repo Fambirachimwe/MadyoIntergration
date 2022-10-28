@@ -33,7 +33,8 @@ export const vendorNumbers = {
     zetdc: '',
     dstv: '',
     moonlight: '',
-    nyaradzo: ''
+    nyaradzo: '',
+    lifeAssurrance: "LIFEASSURERANCE"
 
 }
 
