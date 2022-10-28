@@ -94,7 +94,7 @@ export const netoneAirtimeController = (req, res, next) => {
                                     "mti": "0200",
                                     "vendorReference": generateAirtimeVendorRefence("netone"),
                                     "processingCode": "U50000",
-                                    "vendorNumber": vendorNumbers.econet,
+                                    "vendorNumber": vendorNumbers._liveVendorNumber,
                                     "transactionAmount": cents,
                                     "sourceMobile": netoneSouceMobile,
                                     "targetMobile": targetMobile,

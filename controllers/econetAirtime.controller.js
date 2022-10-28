@@ -96,7 +96,7 @@ export const econetAirtimeController = async (req, res, next) => {
                                 "mti": "0200",
                                 "vendorReference": generateAirtimeVendorRefence("econet"),
                                 "processingCode": "U50000",
-                                "vendorNumber": vendorNumbers.econet,
+                                "vendorNumber": vendorNumbers._liveVendorNumber,
                                 "transactionAmount": cents,
                                 "sourceMobile": econetSouceMobile,
                                 "targetMobile": targetMobile,

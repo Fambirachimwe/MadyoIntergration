@@ -3,7 +3,7 @@ import { nanoid } from "nanoid";
 // instance of axios 
 // import axios from '../util/axios.js'
 import Zesa from "../models/zesa.js";
-import { testVendorNumber } from "../util/constants.js";
+import { testVendorNumber, vendorNumbers } from "../util/constants.js";
 import { failedZesaToken, generateZesaVendorRefence, sendZesaToken, tokenResend, nowDate, mobilePay } from "../util/util.js";
 import { load } from 'cheerio';
 
@@ -60,7 +60,7 @@ export const getCustomer = (req, res, next) => {
             "processingCode": "310000",
             "transactionAmount": 50000,  // this is  only specified in the documentaion but does not make sense
             "transmissionDate": nowDate(),
-            "vendorNumber": "VE20245865801",
+            "vendorNumber": vendorNumbers._liveVendorNumber,
             "merchantName": "ZETDC",
             "productName": "ZETDC_PREPAID",
             "utilityAccount": meterNumber  // this is the meter number

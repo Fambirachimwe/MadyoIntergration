@@ -34,7 +34,9 @@ export const vendorNumbers = {
     dstv: '',
     moonlight: '',
     nyaradzo: '',
-    lifeAssurrance: "LIFEASSURERANCE"
+    lifeAssurrance: "LIFEASSURERANCE",
+
+    _liveVendorNumber: "VE28436262401"
 
 }
 
