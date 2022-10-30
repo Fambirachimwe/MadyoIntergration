@@ -4,7 +4,7 @@ import { nanoid } from "nanoid";
 // import axios from '../util/axios.js'
 import Zesa from "../models/zesa.js";
 import { testVendorNumber, vendorNumbers } from "../util/constants.js";
-import { failedZesaToken, generateZesaVendorRefence, sendZesaToken, tokenResend, nowDate, mobilePay } from "../util/util.js";
+import { failedZesaToken, generateZesaVendorRefence, sendZesaToken, tokenResend, nowDate, mobilePay, smsGateway } from "../util/util.js";
 import { load } from 'cheerio';
 
 // font awesome cdn 
@@ -163,7 +163,9 @@ export const buyToken = (req, res, next) => {
                                     .save()
                                     .then(saved_data => {
                                         console.log('saved into the database ', saved_data);
-                                        sendZesaToken(phoneNumber, saved_data.token);
+
+
+                                        smsGateway(saved_data.token, phoneNumber)
                                     });
 
                                 res.json({

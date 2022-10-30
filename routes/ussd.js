@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import axios from 'axios';
-import { generateAirtimeVendorRefence, nowDate, sendSMS, mobilePay, newSmsGateway } from '../util/util.js'
+import { generateAirtimeVendorRefence, nowDate, sendSMS, mobilePay, smsGateway } from '../util/util.js'
 import Airtime from '../models/airtime.js';
 import express from "express";
 import { vendorNumbers } from '../util/constants.js';
@@ -112,7 +112,7 @@ router.post('/airtime/buy', (req, res, next) => {
                                         .then(() => {
                                             // send an sms to the target mobile using the Madyo gateway
 
-                                            return newSmsGateway(data, `${targetMobile}`);
+                                            return smsGateway(data, `${targetMobile}`);
                                             console.log('saved airtime from ussd application');
                                         })
 
