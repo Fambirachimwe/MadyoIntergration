@@ -1,7 +1,7 @@
 import 'dotenv/config';
-import express from 'express';
+import express, { response } from 'express';
 import axios from 'axios';
-import { generatePolicyVendorRefence, nowDate } from '../util/util.js'
+import { generatePolicyVendorRefence, getCustomerPolicy, nowDate } from '../util/util.js'
 import { vendorNumbers } from '../util/constants.js';
 
 const router = express.Router();
@@ -54,7 +54,73 @@ router.post('/getCustomer', (req, res, next) => {
 // make payment
 
 router.post('/pay', (req, res, next) => {
-    res.send('payment route from the life assurrence')
+
+
+
+    const { mobileNumber, utilityAccount, balance, numberOfMonths, monthlySubscription } = req.body;
+    let _transactionAmount;
+    const url = process.env.BASE_URL;
+
+
+    getCustomerPolicy(utilityAccount, mobileNumber, 1)
+        .then(data => {
+            if (data.data.responseCode === "05") {
+                res.json({
+                    error: "err01",
+                    message: "Failed to verify policy number"
+                })
+            } else {
+                // get customer data 
+
+                const customerData = data.data.customerData.split("|");
+                const monthlyPremium = data.data.amount;
+                const balance = data.data.customerBalance;
+
+                _transactionAmount = balance ? balance : 0 + (numberOfMonths * monthlyPremium);
+
+
+                axios.post(`${url}`,
+                    {
+                        "mti": "0200",
+                        "vendorReference": generatePolicyVendorRefence(),
+                        "processingCode": "U50000",
+                        "vendorNumber": vendorNumbers._liveVendorNumber,
+                        "transactionAmount": _transactionAmount * 100,
+                        "sourceMobile": mobileNumber,
+                        "utilityAccount": utilityAccount,
+                        "customerData": `${numberOfMonths}|${monthlySubscription}`,
+                        "merchantName": "NYARADZO",
+                        "productName": "NYARADZO",
+                        "transmissionDate": nowDate(),
+                        "currencyCode": "ZWL"
+                    }
+                    , {
+                        auth: {
+                            username: process.env.API_USERNAME,
+                            password: process.env.API_PASSWORD
+                        }
+                    }).then(response => {
+                        if (response.data.responseCode === "05") {
+                            res.json({
+                                error: "err01",
+                                message: data.data.narrative
+                            })
+                        }
+                    }
+                    )
+
+
+
+            }
+        })
+
+    // policy type 
+
+    // const _transactionAmount = balance + (numberOfMonths * monthlySubscription);
+
+
+
+
 })
 
 

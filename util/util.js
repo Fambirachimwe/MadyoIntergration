@@ -356,3 +356,24 @@ export const smsGateway = (data, number) => {
 
 
 }
+
+// for funeral services
+
+
+export const getCustomerPolicy = async (utilityAccount, mobileNumber, policyType) => {
+
+    const url = "https://madyointergration-production.up.railway.app";
+    return await axios.post(`${url}/lifeAssurrence/getCustomer`,
+        {
+            "mobileNumber": mobileNumber,
+            "utilityAccount": utilityAccount,
+            "policyType": policyType
+        },
+        {
+            auth: {
+                username: process.env.API_USERNAME,
+                password: process.env.API_PASSWORD
+            }
+        }
+    )
+}
