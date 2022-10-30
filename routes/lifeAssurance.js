@@ -46,7 +46,7 @@ router.post('/getCustomer', (req, res, next) => {
         }
 
     ).then(data => {
-        console.log(data)
+        res.send(data.data)
     })
 });
 
