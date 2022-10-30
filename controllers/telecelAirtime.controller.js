@@ -139,7 +139,7 @@ export const telecelAirtimeController = (req, res, next) => {
                                             //  send SMS to client using Twilio
 
                                             console.log('..................', targetMobile)
-                                            smsGateway(`Airtime Credited with ${transactionAmount / 100}`, targetMobile);
+                                            smsGateway(`Airtime Credited with ${transactionAmount / 100}`,);
                                         })
 
                                     res.send(data.data)

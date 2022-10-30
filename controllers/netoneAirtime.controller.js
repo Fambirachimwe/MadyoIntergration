@@ -137,7 +137,7 @@ export const netoneAirtimeController = (req, res, next) => {
                                 .then(() => {
                                     //  send SMS to client using  the e-solutions gateway
 
-                                    smsGateway(`Airtime Credited with ${transactionAmount / 100}`, targetMobile);
+                                    smsGateway(`Airtime Credited with ${transactionAmount / 100}`);
                                 })
 
                             res.send(data.data)
