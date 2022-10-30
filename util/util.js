@@ -280,7 +280,7 @@ export const savePaymentToDatabase = (data) => {
 
 // SMS Gate
 
-export const senEconetSMS_Airtime = (transactionAmount, number) => {
+export const sendEconetSMS_Airtime = (transactionAmount, number) => {
 
     const sms = `Airtime Credited with ${transactionAmount}`;
     const baseSmsUrl = "https://europe-west2-projectx-ussd-game.cloudfunctions.net/send_econet_sms_message";

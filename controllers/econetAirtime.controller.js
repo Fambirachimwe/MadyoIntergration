@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { generateAirtimeVendorRefence, nowDate, sendSMS, mobilePay, newSmsGateway, senEconetSMS_Airtime } from '../util/util.js'
+import { generateAirtimeVendorRefence, nowDate, mobilePay, sendEconetSMS_Airtime } from '../util/util.js'
 import Airtime from '../models/airtime.js';
 import { vendorNumbers } from '../util/constants.js'
 import { nanoid } from 'nanoid';
@@ -145,7 +145,7 @@ export const econetAirtimeController = async (req, res, next) => {
 
                                     // sendSMS(`${targetMobile}`, data.data)
                                     // using the Madyo sms gateway
-                                    senEconetSMS_Airtime(transactionAmount, `${targetMobile}`)
+                                    sendEconetSMS_Airtime(transactionAmount, `${targetMobile}`)
                                 })
 
                             return res.send(data.data)
