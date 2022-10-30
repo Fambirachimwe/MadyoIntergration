@@ -1,7 +1,7 @@
 import 'dotenv/config'
 import axios from 'axios';
 import Twilio from 'twilio';
-import { apiUrl } from './constants.js';
+import { apiUrl, econetSMSGatewayUrl, eSolutionsSmsGatewayUrl } from './constants.js';
 import 'dotenv/config';
 import { Paynow } from 'paynow';
 import { nanoid } from 'nanoid';
@@ -277,30 +277,10 @@ export const savePaymentToDatabase = (data) => {
     // save the data in the database 
 }
 
-// TODO: add the setTimeOut function
-// auto increment timer
-
-export const TimerMs = (Function) => {
-    const t1 = 60000;
-    let _data;
-    setTimeout(() => {
-        Function.then(data => {
-            if (data.data.responseCode === "09") {
-                Timer(Function);
-            } else if (data.data.responseCode === "00") {
-                _data = data.data;
-
-            }
-        })
-    }, t1);
-
-    return _data;
-
-}
 
 // SMS Gate
 
-export const newSmsGateway = (data, transactionAmount, number) => {
+export const senEconetSMS_Airtime = (transactionAmount, number) => {
 
     const sms = `Airtime Credited with ${transactionAmount}`;
     const baseSmsUrl = "https://europe-west2-projectx-ussd-game.cloudfunctions.net/send_econet_sms_message";
@@ -309,7 +289,70 @@ export const newSmsGateway = (data, transactionAmount, number) => {
         sms: sms,
         number: number,
         title: "From MadyoZW"
-    });
+    }).then()
+        .catch(err => {
+            console.log('failed to send sms using the econet gateway ', err)
+        })
+
+
+}
+
+// Make a SMS gateway function that send messages for all the operators
+
+
+export const smsGateway = (data, number) => {
+
+    const econet = /^077|^078/;
+    // const telecel = /^073/;
+    // const netone = /^071/;
+
+    const sms = data;   // send the data to be sent as a string
+    const baseSmsUrl = econetSMSGatewayUrl;
+
+    const currentTime = new Date();
+
+
+
+    if (econet.test(number)) {
+        //  this is an econet number
+        // do send the message using the ecoent gateway 
+        axios.post(`${baseSmsUrl}`, {
+            sms: sms,
+            number: number,
+            title: "From MadyoZW"
+        }).then()
+            .catch(err => {
+                console.log(err)
+            });
+
+    } else {
+        //  send an sms using the e solution gateway
+        axios.post(`${eSolutionsSmsGatewayUrl}`,
+            {
+                "originator": "MadyoZW",
+                "destination": `${number}`,
+                "messageText": sms,
+                "messageReference": nanoid(10),
+                "messageDate": nowDate(),
+                "messageValidity": "03:00",
+                "sendDateTime": `${currentTime.getHours()}:${currentTime.getMinutes()}`
+            },
+            {
+                auth: {
+                    username: process.env.MADYO_SMS_USERNAME,
+                    password: process.env.MADYO_SMS_PASSWORD
+                }
+            }
+        )
+            .then(data => {
+                if (data.data.status === "FAILED") {
+                    console.log("failed to send message using the e solution gateway ", data.data.narrative)
+                }
+            })
+            .catch(err => {
+                console.log(err) // put this in logger file.. and save them to the database
+            })
+    }
 
 
 }

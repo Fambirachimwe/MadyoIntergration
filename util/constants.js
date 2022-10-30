@@ -110,3 +110,8 @@ const STATUS_CODES = {
     '511': 'Network Authentication Required'
 }
 
+
+export const econetSMSGatewayUrl = "https://europe-west2-projectx-ussd-game.cloudfunctions.net/send_econet_sms_message"
+
+
+export const eSolutionsSmsGatewayUrl = "https://mobile.esolutions.co.zw/bmg/api/single";
