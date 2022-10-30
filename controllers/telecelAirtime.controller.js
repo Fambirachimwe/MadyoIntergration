@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { generateAirtimeVendorRefence, mobilePay, nowDate, sendSMS } from '../util/util.js'
+import { generateAirtimeVendorRefence, mobilePay, nowDate } from '../util/util.js'
 import Airtime from '../models/airtime.js'
 import { nanoid } from 'nanoid'
 import { vendorNumbers } from '../util/constants.js';
