@@ -87,6 +87,14 @@ export const buyToken = (req, res, next) => {
 
     // 41234567890  demo meterNumber
     const cents = amount * 100;
+    const netone = /^071/;   // regex for econet phone number
+    const econet = /^077|^078/;
+    let method;
+
+    // check if the paying number is an ecocash or onemoney number
+    if (econet.test(payingNumber)) { method = 'ecocash' }
+    if (netone.test(payingNumber)) { method = 'onemoney' }
+
 
     if (amount < 500) {
 
@@ -101,7 +109,7 @@ export const buyToken = (req, res, next) => {
         // console.log(amount)
 
         // make mobile payment here  using paynow
-        mobilePay(amount, 'ecocash', `0${payingNumber.slice(3)}`).then(async (response) => {
+        mobilePay(amount, method, `${payingNumber}`).then(async (response) => {
             payingNumber
             // TODO: safe the payment in the database 
 
@@ -119,7 +127,7 @@ export const buyToken = (req, res, next) => {
                     my_status = "";
                     return res.json({
                         error: 'err01',
-                        message: "Ecocash confirmation failed"
+                        message: "Mobile money confirmation failed"
                     });
 
                 }
