@@ -70,7 +70,7 @@ export const netoneAirtimeController = (req, res, next) => {
 
                 return res.json({
                     error: 'err01',
-                    message: "Ecocash confirmation failed"
+                    message: "Mobile confirmation failed"
                 })
             }
 
@@ -137,7 +137,7 @@ export const netoneAirtimeController = (req, res, next) => {
                                 .then(() => {
                                     //  send SMS to client using  the e-solutions gateway
 
-                                    smsGateway(`Airtime Credited with ${transactionAmount / 100}`);
+                                    smsGateway(`Airtime Credited with $${transactionAmount / 100}00`);
                                 })
 
                             res.send(data.data)
@@ -148,7 +148,7 @@ export const netoneAirtimeController = (req, res, next) => {
         } else {
             return res.json({
                 error: 'err01',
-                message: "Failed to make ecocash transaction"
+                message: "Failed to make mobile transaction"
             })
         }
 

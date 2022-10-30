@@ -282,7 +282,7 @@ export const savePaymentToDatabase = (data) => {
 
 export const sendEconetSMS_Airtime = (transactionAmount, number) => {
 
-    const sms = `Airtime Credited with ${transactionAmount}`;
+    const sms = `Airtime Credited with $${transactionAmount}.00`;
     const baseSmsUrl = "https://europe-west2-projectx-ussd-game.cloudfunctions.net/send_econet_sms_message";
 
     axios.post(`${baseSmsUrl}`, {
