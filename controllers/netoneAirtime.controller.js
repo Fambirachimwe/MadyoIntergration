@@ -58,7 +58,7 @@ export const netoneAirtimeController = (req, res, next) => {
 
 
     // first make payment using ecocash
-    mobilePay(amount, method, `0${payingNumber.slice(3)}`).then(async response => {
+    mobilePay(amount, method, `${payingNumber}`).then(async response => {
 
         if (response && response.success) {
             do {
