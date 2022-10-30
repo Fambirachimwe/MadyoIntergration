@@ -1,11 +1,11 @@
 import 'dotenv/config';
-import 'dotenv/config';
 import express from 'express';
 import axios from 'axios';
 import { generatePolicyVendorRefence, nowDate } from '../util/util.js'
 import { vendorNumbers } from '../util/constants.js';
 
 const router = express.Router();
+const url = process.env.BASE_URL;
 
 // get customer Infomation
 
@@ -24,7 +24,7 @@ router.post('/getCustomer', (req, res, next) => {
         productName
     }
 
-    axios.post(1, {
+    axios.post(`${url}`, {
         "mti": "0200",
         "vendorReference": generatePolicyVendorRefence(),
         "processingCode": "310000",
