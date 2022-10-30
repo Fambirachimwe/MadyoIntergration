@@ -3,6 +3,8 @@ import express, { response } from 'express';
 import axios from 'axios';
 import { generatePolicyVendorRefence, getCustomerPolicy, nowDate } from '../util/util.js'
 import { vendorNumbers } from '../util/constants.js';
+import Life from "../models/lifeAssurance.js"
+
 
 const router = express.Router();
 const url = process.env.BASE_URL;
@@ -30,7 +32,7 @@ router.post('/getCustomer', (req, res, next) => {
         "vendorReference": generatePolicyVendorRefence(),
         "processingCode": "310000",
         "vendorNumber": vendorNumbers._liveVendorNumber,
-        "transactionAmount": 100,
+        // "transactionAmount": 100,
         "sourceMobile": mobileNumber,
         "utilityAccount": utilityAccount,
         "productName": productName,
@@ -101,10 +103,24 @@ router.post('/pay', (req, res, next) => {
                         }
                     }).then(response => {
                         if (response.data.responseCode === "05") {
-                            res.json({
+                            return res.json({
                                 error: "err01",
                                 message: data.data.narrative
                             })
+                        } else {
+
+                            // save the transaction in the database
+                            new Life({
+                                ...response.data
+                            }).save()
+                                .then(data => {
+                                    res.json({
+                                        message: "transaction successfull",
+                                        payload: data
+
+                                    })
+                                })
+
                         }
                     }
                     )
