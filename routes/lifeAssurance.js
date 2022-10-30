@@ -16,24 +16,25 @@ router.post('/getCustomer', (req, res, next) => {
     let productName;
     let merchantName;
 
-    if (policyType === "NYARADZO") {
+    if (policyType === 1) {
         productName = "NYARADZO";
         merchantName = "NYARADZO"
 
     } else {
-        productName
+        productName = "MOONLIGHT";
+        merchantName = "MOONLIGHT"
     }
 
     axios.post(`${url}`, {
         "mti": "0200",
         "vendorReference": generatePolicyVendorRefence(),
         "processingCode": "310000",
-        "vendorNumber": vendorNumbers.lifeAssurrance,
+        "vendorNumber": vendorNumbers._liveVendorNumber,
         "transactionAmount": 100,
         "sourceMobile": mobileNumber,
         "utilityAccount": utilityAccount,
-        "productName": policyType,
-        "merchantName": "NYARADZO",
+        "productName": productName,
+        "merchantName": merchantName,
         "transmissionDate": nowDate(),
         "currencyCode": "ZWL"
     },
