@@ -329,7 +329,7 @@ export const smsGateway = (data, number) => {
         //  send an sms using the e solution gateway
         axios.post(`${eSolutionsSmsGatewayUrl}`,
             {
-                "originator": "MadyoZW",
+                "originator": "From MadyoZW",
                 "destination": `${number}`,
                 "messageText": sms,
                 "messageReference": nanoid(10),

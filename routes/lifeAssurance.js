@@ -2,7 +2,7 @@ import 'dotenv/config';
 import 'dotenv/config';
 import express from 'express';
 import axios from 'axios';
-import { generatePolicyVendorRefence } from '../util/util.js'
+import { generatePolicyVendorRefence, nowDate } from '../util/util.js'
 import { vendorNumbers } from '../util/constants.js';
 
 const router = express.Router();
