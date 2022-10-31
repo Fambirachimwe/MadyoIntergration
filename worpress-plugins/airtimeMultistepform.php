@@ -42,10 +42,10 @@ function Form(){
                 <input type="button" name="data[password]" class="next btn btn-info" value="Next" />
             </fieldset>
             <fieldset>
-                <h2> Step 2: Payment using Ecocash </h2>
+                <h2> Step 2: Payment using Ecocash or Onemoney </h2>
                 <div class="form-group">
                 <label for="fName">Ecocash Number</label>
-                <input type="text" required id="cf-payingNumber" class="form-control" name="data[fName]" id="fName" placeholder="Ecocash Number">
+                <input type="text" required id="cf-payingNumber" class="form-control" name="data[fName]" id="fName" placeholder="Ecocash number or Onemoney nubmer">
             </div>
             
                 <input type="button" name="previous" class="previous btn btn-secondary" value="Previous" />
@@ -104,7 +104,7 @@ function formJs (){
             $("#_submit").click(function(event){
                 event.preventDefault();
                 var type = $("#cf-type").val();
-                var baseUrl = "http://localhost:5500";
+                var baseUrl = "https://madyointergration-production.up.railway.app";
                 let ajaxUrl;
                 switch(type){
                     case "econet":

@@ -47,7 +47,7 @@ app.use('/dstv', dstvRoutes);
 app.use('/airtime', airTimeRoutes);
 app.use('/ussd', usssdRoutes);
 app.use('/lifeAssurrence', lifeAssuranceRoutes);
-app.use('/testPese', peseRoute)
+app.use('/pese', peseRoute)
 
 
 

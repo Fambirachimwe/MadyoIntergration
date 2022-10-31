@@ -11,19 +11,36 @@ pesepay.returnUrl = 'https://example.com/return'
 
 
 // # Create the payment
-const payment = pesepay.createPayment('CURRENCY_CODE', 'PAYMENT_METHOD_CODE', 'CUSTOMER_EMAIL(OPTIONAL)', 'CUSTOMER_PHONE_NUMBER(OPTIONAL)', 'CUSTOMER_NAME(OPTIONAL)')
 
-//  # After selecting the payment method create an object of the payment method required fields(if any)
-const requiredFields = { 'requiredFieldName': 'requiredFieldValue' }
+export const peseMobilePay = (amount, currencyCode, paymentMethodCode, payingNumber) => {
 
-//  # Send the request to make payment
-pesepay
-    .makeSeamlessPayment(payment, 'PAYMENT_REASON', AMOUNT, requiredFields)
-    .then((response) => {
-        // Save the poll url and reference number (used to check the status of a transaction)
-        const pollUrl = response.pollUrl;
-        const referenceNumber = response.referenceNumber;
-    })
-    .catch((error) => {
-        // Handle error
-    });
+    // PZW201 ecocash
+    // PZW209 cabs zimswitch card
+    //  PZW210 payGo    
+
+    const reqFields = {
+        "customerPhoneNumber": `${payingNumber}`,
+    }
+
+    const payment = pesepay.createPayment(
+        currencyCode,   // USD OR ZWL
+        paymentMethodCode, // PZW201 ,
+        '',  // optional customer email
+        ''  // optional customer name
+    )
+
+    //  # After selecting the payment method create an object of the payment method required fields(if any)
+
+    //  # Send the request to make payment
+    return pesepay.makeSeamlessPayment(
+        payment,
+        'Online_payment',
+        amount,
+        reqFields  //
+
+    );
+
+
+
+
+}

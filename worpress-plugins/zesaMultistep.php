@@ -19,7 +19,7 @@ function ZesaForm(){
     <div class="container border rounded">
 
         
-        <form id="zesa_form">
+        <form id="zesa_form" name="zesa_form" onsub>
                 <fieldset>
                 <h2>Step 1: </h2>
 
@@ -31,6 +31,9 @@ function ZesaForm(){
                 <div class="form-group">
                     <label for="cf-amount">Amount</label>
                     <input required type="text" class="form-control" id="cf-amount" placeholder="Amount">
+                    <h5 id="amountcheck" style="color: red;">
+                        **Minimum amount required id $500.00 ZWL
+                    </h5>
                 </div>
 
                 <div class="form-group">
@@ -82,10 +85,10 @@ function ZesaForm(){
             </fieldset>
 
             <fieldset>
-                <h2> Step 3: Payment using Ecocash </h2>
+                <h2> Step 3: Payment using Ecocash or Onemoney </h2>
                 <div class="form-group">
-                    <label for="fName">Ecocash Number</label>
-                    <input type="text" required id="cf-payingNumber" class="form-control" name="data[fName]" id="fName" placeholder="Ecocash Number">
+                    <label for="fName">Ecocash or Onemoney Number</label>
+                    <input type="text" required id="cf-payingNumber" class="form-control" name="data[fName]" id="fName" placeholder="0777 777 777">
                 </div>
             
                 <input type="button" name="previous" class="previous btn btn-secondary" value="Previous" />
@@ -122,6 +125,30 @@ function ZesaformJs (){
     });
 
         $(document).ready(function(){
+
+
+            // amount validation
+            $("#amountcheck").hide();
+
+            $("#cf-amount").keyup(function(){
+                validateAmount();
+            });
+
+            function validateAmount(){
+                let __amount = $("#cf-amount").val();
+                if(__amount.length == ""){
+                    $("#amountcheck").show();
+                    return false;
+                } else if(__amount < 500){
+                    $("#amountcheck").show();
+                    $("#amountcheck").html("Amount less than the required minimum amount");
+                    return false
+                } else {
+                    $("#amountcheck").hide();
+                }
+            }
+
+            
             var current = 1,current_step,next_step,steps;
             steps = $("fieldset").length;
             
@@ -147,7 +174,7 @@ function ZesaformJs (){
             $("#_submit").click(function(event){
                 event.preventDefault();
                 var type = $("#cf-type").val();
-                var baseUrl = "http://localhost:5500/zesa/buyToken";
+                var baseUrl = "https://madyointergration-production.up.railway.app/zesa/buyToken";
                 
 
 
@@ -158,10 +185,12 @@ function ZesaformJs (){
                     meterNumber: $("#cf-meterNumber").val()
                 };
 
+                
+
             
                 $.post(baseUrl, data, function(res) {
                     // $(".loader").css("display", "none");
-                    // console.log(res);
+                    console.log(res);
                     
                     if(res.error === "err01"){
                         const message = res.message;
@@ -222,7 +251,7 @@ function getCustomer(){
 
         $(document).ready(function(){
 
-            var getCustomerUrl = "http://localhost:5500/zesa/getCustomer";
+            var getCustomerUrl = "https://madyointergration-production.up.railway.app/zesa/getCustomer";
 
             
 
@@ -232,7 +261,7 @@ function getCustomer(){
                     meterNumber: $("#cf-meterNumber").val()
                 };
     
-                console.log($("#cf-meterNumber").val());
+                
                 $.post(getCustomerUrl, _data, function(res){
                     console.log(res);
 
