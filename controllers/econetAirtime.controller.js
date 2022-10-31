@@ -113,6 +113,9 @@ export const econetAirtimeController = async (req, res, next) => {
     peseMobilePay(amount, "ZWL", "PZW201", payingNumber).then(async response => {
         // handle the response here
 
+        console.log(response);
+
+
         if (response && response.success) {
             do {
                 await getTransStatusPese(response.pollUrl);
