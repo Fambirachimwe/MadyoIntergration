@@ -32,7 +32,7 @@ router.post('/getCustomer', (req, res, next) => {
         "vendorReference": generatePolicyVendorRefence(),
         "processingCode": "310000",
         "vendorNumber": vendorNumbers._liveVendorNumber,
-        // "transactionAmount": 100,
+        "transactionAmount": 100,
         "sourceMobile": mobileNumber,
         "utilityAccount": utilityAccount,
         "productName": productName,
