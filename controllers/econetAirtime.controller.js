@@ -110,7 +110,7 @@ export const econetAirtimeController = async (req, res, next) => {
     if (econet.test(payingNumber)) { method = 'ecocash' }
     if (netone.test(payingNumber)) { method = 'onemoney' }
 
-    peseMobilePay(amount, currencyCode, paymentMethodCode, payingNumber).then(async response => {
+    peseMobilePay(amount, "ZWL", "PZW201", payingNumber).then(async response => {
         // handle the response here
 
         if (response && response.success) {
