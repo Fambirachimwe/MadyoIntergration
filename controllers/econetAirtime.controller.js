@@ -157,6 +157,8 @@ export const econetAirtimeController = async (req, res, next) => {
 
                 )
                     .then(data => {
+
+                        console.log(data.data)
                         if (data.data.responseCode === "05") {
 
                             // res.send(data.data)
