@@ -135,25 +135,90 @@ export const sendSMS = async (to, data) => {
 
 }
 
-export const sendZesaToken = async (to, data) => {
 
-    const accountSid = process.env.TWILIO_ACCOUNT_SID;
-    const authToken = process.env.TWILIO_AUTH_TOKEN;
-    const client = new Twilio(accountSid, authToken);
-    // const accountNumber = process.env.TWILIO_TEST_NUMBER
-    client.messages
-        .create({
-            body: `
-            token:,  ${data}
-            `,
-            from: "+12059278608", // this is the twilio phone number
-            to: `+263${to}`
-        }
-        ).then(() => {
-            console.log('message sent')
 
-        }
+const formartMessage = (_str) => {
+    const splitted = _str.split("|");
+    const token = splitted[0];
+    const units = splitted[1];
+    const rate = splitted[2];
+    const merchantReceipt = splitted[3];
+    const netAmount = splitted[4];
+    const taxAmount = splitted[5];
+    const taxRate = splitted[6]
+
+    return {
+        token, units, rate, merchantReceipt, netAmount, taxAmount, taxRate
+    }
+}
+
+
+
+export const sendZesaToken = (token, number, meterNumber, amount) => {
+
+    const econet = /^077|^078/;
+    // const telecel = /^073/;
+    // const netone = /^071/;
+
+    const messageObject = formartMessage(token)
+
+    // example of the token data from the response 
+
+    // 34397317664422574275|4.8||RCT1666967869069|47170|0|0
+
+    const sms = `token: ${messageObject.token}
+    meter: ${meterNumber}
+    kWH: ${messageObject.units}
+    Energy: ${messageObject.netAmount}
+    Amount: ${amount}`;   // send the data to be sent as a string
+
+
+
+
+
+    const baseSmsUrl = econetSMSGatewayUrl;
+    const currentTime = new Date();
+    if (econet.test(number)) {
+        //  this is an econet number
+        // do send the message using the ecoent gateway 
+        axios.post(`${baseSmsUrl}`, {
+            sms: sms,
+            number: number,
+            title: "From MadyoZW"
+        }).then()
+            .catch(err => {
+                console.log(err)
+            });
+
+    } else {
+        //  send an sms using the e solution gateway
+        axios.post(`${eSolutionsSmsGatewayUrl}`,
+            {
+                "originator": "MadyoZW",
+                "destination": `${number}`,
+                "messageText": sms,
+                "messageReference": nanoid(10),
+                "messageDate": nowDate(),
+                "messageValidity": "03:00",
+                "sendDateTime": `${currentTime.getHours()}:${currentTime.getMinutes()}`
+            },
+            {
+                auth: {
+                    username: process.env.MADYO_SMS_USERNAME,
+                    password: process.env.MADYO_SMS_PASSWORD
+                }
+            }
         )
+            .then(data => {
+                if (data.data.status === "FAILED") {
+                    console.log("failed to send message using the e solution gateway ", data.data.narrative)
+                }
+            })
+            .catch(err => {
+                console.log(err) // put this in logger file.. and save them to the database
+            })
+    }
+
 
 }
 
@@ -308,11 +373,7 @@ export const smsGateway = (data, number) => {
 
     const sms = data;   // send the data to be sent as a string
     const baseSmsUrl = econetSMSGatewayUrl;
-
     const currentTime = new Date();
-
-
-
     if (econet.test(number)) {
         //  this is an econet number
         // do send the message using the ecoent gateway 

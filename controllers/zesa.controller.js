@@ -171,9 +171,8 @@ export const buyToken = (req, res, next) => {
                                     .save()
                                     .then(saved_data => {
                                         console.log('saved into the database ', saved_data);
-
-
-                                        smsGateway(saved_data.token, phoneNumber)
+                                        // send token via sms 
+                                        sendZesaToken(saved_data.token, phoneNumber, meterNumber, amount);
                                     });
 
                                 res.json({

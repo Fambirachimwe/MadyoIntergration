@@ -59,7 +59,7 @@ const getTransStatusPese = async (pollUrl) => {
 
 
 
-export const netoneAirtimeControllerV2 = (req, res, next) => {
+export const telecelAirtimeControllerV2 = (req, res, next) => {
 
     // source mobile is the line which airtime is going to be deducted
     const { amount, targetMobile, payingNumber } = req.body;
