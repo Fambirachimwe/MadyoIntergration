@@ -41,23 +41,31 @@ const getTransStatusPese = async (pollUrl) => {
         }
     }
 
-    const response = await axios.get(`${pollUrl}`, config);
-    // console.log(response.data)
+    try {
 
-    const _data = await decryptPayload(response.data.payload);
-    console.log("this is the decrypted data", _data)
 
-    if (_data.transactionStatus === "PENDING") {
-        my_status = _data.transactionStatus;
-        setTimeout(async () => {
-            await getTransStatusPese(pollUrl)
-        }, 5000);
-    } else {
+        const response = await axios.get(`${pollUrl}`, config);
+        // console.log(response.data)
 
-        my_status = _data.transactionStatus;
+        const _data = await decryptPayload(response.data.payload);
+        console.log("this is the decrypted data", _data)
 
+        if (_data.transactionStatus === "PENDING") {
+            my_status = _data.transactionStatus;
+            setTimeout(async () => {
+                await getTransStatusPese(pollUrl)
+            }, 5000);
+        } else {
+
+            my_status = _data.transactionStatus;
+
+        }
+
+
+
+    } catch (error) {
+        my_status = "FAILED"
     }
-
 
 
 
