@@ -94,7 +94,8 @@ export const econetAirtimeControllerV2 = async (req, res, next) => {
 
                 if (my_status === "FAILED") {
 
-                    console.log(my_status)
+                    // console.log(my_status)
+                    my_status = "";
 
                     res.json({
                         error: 'err01',
@@ -199,6 +200,8 @@ export const econetAirtimeControllerV2 = async (req, res, next) => {
 
 
                     // handle everything here
+
+                    my_status = "";
                 }
 
 

@@ -94,7 +94,9 @@ export const netoneAirtimeControllerV2 = (req, res, next) => {
 
                 if (my_status === "FAILED") {
 
-                    console.log(my_status)
+                    console.log(my_status);
+
+                    my_status = "";
 
                     res.json({
                         error: 'err01',
