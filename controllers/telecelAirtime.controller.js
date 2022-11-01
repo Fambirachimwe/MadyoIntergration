@@ -105,7 +105,25 @@ export const telecelAirtimeController = (req, res, next) => {
 
                         )
                             .then(data => {
+                                const { vendorReference, transactionAmount, utilityAccount, narrative, currencyCode, sourceMobile, targetMobile, transmissionDate } = data.data;
+
                                 if (data.data.responseCode === "05") {
+
+                                    // save the failed transaction in the database
+                                    new Airtime({
+                                        orderNumber: nanoid(10),
+                                        vendorReference: vendorReference,
+                                        type: "telecel",
+                                        amount: transactionAmount / 100,
+                                        status: "failed",
+                                        utilityAccount: utilityAccount,
+                                        narrative: narrative,
+                                        currencyCode, currencyCode,
+                                        sourceMobile: sourceMobile,
+                                        targetMobile: targetMobile,
+                                        date: transmissionDate
+                                    })
+                                        .save()
 
                                     // res.send(data.data)
                                     console.log("General Error.. response code 05")
@@ -118,7 +136,7 @@ export const telecelAirtimeController = (req, res, next) => {
                                     // save transaction in the database and  send an sms to 
                                     // the client with the credited amount and the client final balance after airtime purchase
 
-                                    const { vendorReference, transactionAmount, utilityAccount, narrative, currencyCode, sourceMobile, targetMobile, transmissionDate } = data.data;
+
 
                                     //  save the airtime transaction in the database 
                                     new Airtime({
