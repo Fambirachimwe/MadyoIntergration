@@ -41,11 +41,11 @@ const getTransStatusPese = async (pollUrl) => {
     // console.log(response.data)
 
     const _data = await decryptPayload(response.data.payload);
-    // console.log(_data)
+    console.log("this is the decrypted data", _data)
 
     if (_data.transactionStatus === "PENDING") {
         my_status = _data.transactionStatus;
-        setTimeout(() => {
+        setTimeout(async () => {
             await getTransStatusPese(pollUrl)
         }, 5000);
     } else {
@@ -62,7 +62,7 @@ const getTransStatusPese = async (pollUrl) => {
 
 
 
-export const econetAirtimeController = async (req, res, next) => {
+export const econetAirtimeControllerV2 = async (req, res, next) => {
 
     // source mobile is the line which airtime is going to be deducted
     const { amount, targetMobile, payingNumber } = req.body;
@@ -70,6 +70,7 @@ export const econetAirtimeController = async (req, res, next) => {
     // validate if the paying number and the targetMobile is an econet phone number
     const econet = /^077|^078/;   // regex for econet phone number
     const netone = /^071/;
+    let method;
 
     // check if the paying number is an ecocash or onemoney number
     if (econet.test(payingNumber)) { method = 'ecocash' }
@@ -103,6 +104,10 @@ export const econetAirtimeController = async (req, res, next) => {
 
                 else if (my_status === "SUCCESS") {
 
+                    console.log("ecocash transaction completed")
+
+
+
                     axios.post(`${url}`,
                         {
                             "mti": "0200",
@@ -111,8 +116,8 @@ export const econetAirtimeController = async (req, res, next) => {
                             "vendorNumber": vendorNumbers._liveVendorNumber,
                             "transactionAmount": cents,
                             "sourceMobile": econetSouceMobile,
-                            "targetMobile": targetMobile,
-                            "utilityAccount": targetMobile,
+                            "targetMobile": `263${targetMobile.slice(1)}`,
+                            "utilityAccount": `263${targetMobile.slice(1)}`,
                             "merchantName": "ECONET",
                             "productName": "ECONET_AIRTIME",
                             "transmissionDate": nowDate(),
@@ -129,12 +134,12 @@ export const econetAirtimeController = async (req, res, next) => {
                     )
                         .then(data => {
 
-                            console.log(data.data)
+                            // console.log(data.data)
                             if (data.data.responseCode === "05") {
 
                                 // res.send(data.data)
                                 console.log("General Error.. response code 05")
-                                res.json({
+                                return res.json({
                                     error: "err01",
                                     message: data.data.narrative,
                                     description: data.data

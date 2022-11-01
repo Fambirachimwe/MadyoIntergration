@@ -11,6 +11,9 @@ import path from 'path';
 import usssdRoutes from './routes/ussd.js';
 import lifeAssuranceRoutes from './routes/lifeAssurance.js';
 import peseRoute from './routes/pesepayRoute.js';
+import { econetAirtimeControllerV2 } from './controllers/econet.controllerV2.js';
+
+// import { econetAirtimeControllerV2 } from "module";
 
 
 // connection to mongoDB
@@ -48,6 +51,11 @@ app.use('/airtime', airTimeRoutes);
 app.use('/ussd', usssdRoutes);
 app.use('/lifeAssurrence', lifeAssuranceRoutes);
 app.use('/pese', peseRoute)
+
+
+// testing the econet controller V2 
+
+app.use('/v2/econet/buy', econetAirtimeControllerV2)
 
 
 
