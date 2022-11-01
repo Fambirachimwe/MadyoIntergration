@@ -4,6 +4,7 @@ import express from 'express';
 import cors from 'cors';
 import vendorRoutes from './routes/vendor.js';
 import zesaRoutes from './routes/zesa.js';
+import zesaV2Routes from './routes/zesaV2.js';
 import dstvRoutes from './routes/dstv.js'
 import airTimeRoutes from './routes/airtime.js';
 import mongoose from "mongoose";
@@ -60,6 +61,7 @@ app.use('/pese', peseRoute)
 app.use('/v2/econet/buy', econetAirtimeControllerV2);
 app.use('/v2/netone/buy', netoneAirtimeControllerV2);
 app.use('/v2/telecel/buy', telecelAirtimeControllerV2);
+app.use('/v2/zesa', zesaRoutes);
 
 
 
