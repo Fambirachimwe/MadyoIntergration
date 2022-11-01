@@ -64,7 +64,8 @@ const getTransStatusPese = async (pollUrl) => {
 
 
     } catch (error) {
-        my_status = "FAILED"
+        my_status = "FAILED";
+        console.log(error)
     }
 
 
