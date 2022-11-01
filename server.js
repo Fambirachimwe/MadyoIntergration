@@ -61,7 +61,7 @@ app.use('/pese', peseRoute)
 app.use('/v2/econet/buy', econetAirtimeControllerV2);
 app.use('/v2/netone/buy', netoneAirtimeControllerV2);
 app.use('/v2/telecel/buy', telecelAirtimeControllerV2);
-app.use('/v2/zesa', zesaRoutes);
+app.use('/v2/zesa', zesaV2Routes);
 
 
 
