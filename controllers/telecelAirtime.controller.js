@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { generateAirtimeVendorRefence, mobilePay, nowDate } from '../util/util.js'
+import { generateAirtimeVendorRefence, mobilePay, nowDate, smsGateway } from '../util/util.js'
 import Airtime from '../models/airtime.js'
 import { nanoid } from 'nanoid'
 import { vendorNumbers } from '../util/constants.js';
@@ -139,7 +139,7 @@ export const telecelAirtimeController = (req, res, next) => {
                                             //  send SMS to client using Twilio
 
                                             console.log('..................', targetMobile)
-                                            smsGateway(`Airtime Credited with ${transactionAmount / 100}`,);
+                                            smsGateway(`Airtime Credited with $${transactionAmount / 100}.00`, targetMobile);
                                         })
 
                                     res.send(data.data)
