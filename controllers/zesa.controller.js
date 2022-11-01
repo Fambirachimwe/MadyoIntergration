@@ -63,7 +63,7 @@ export const getCustomer = (req, res, next) => {
             "vendorNumber": vendorNumbers._liveVendorNumber,
             "merchantName": "ZETDC",
             "productName": "ZETDC_PREPAID",
-            "utilityAccount": meterNumber  // this is the meter number
+            "utilityAccount": `${meterNumber}`  // this is the meter number
         },
         // auth object
 
