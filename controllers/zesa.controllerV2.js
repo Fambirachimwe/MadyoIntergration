@@ -84,6 +84,8 @@ export const getCustomer = (req, res, next) => {
 
 
     ).then(data => {
+
+        console.log(data.data)
         res.send(data.data)
     })
 }

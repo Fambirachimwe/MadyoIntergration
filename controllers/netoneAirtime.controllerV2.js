@@ -1,10 +1,10 @@
 import axios from 'axios';
-import { generateAirtimeVendorRefence, mobilePay, nowDate, smsGateway } from '../util/util.js'
+import { generateAirtimeVendorRefence, nowDate, smsGateway } from '../util/util.js'
 import Airtime from '../models/airtime.js'
 import { nanoid } from 'nanoid'
 import { vendorNumbers } from '../util/constants.js';
-import { load } from 'cheerio';
-
+import { peseMobilePay } from '../util/pesepayUtil.js';
+import crypto from 'crypto';
 
 const url = process.env.BASE_URL;
 const netoneSouceMobile = "263719403033"
@@ -15,7 +15,9 @@ const decryptPayload = async (payload) => {
 
     let decrypted = decipher.update(payload, 'base64', 'utf8');
     let _obj = decrypted.replaceAll('{&', '{"') + decipher.final('utf8');
-    const jsonObject = JSON.parse(_obj);
+    const jsonObject = await JSON.parse(_obj);
+
+    console.log(jsonObject)
 
 
     // return data;
@@ -37,21 +39,21 @@ const getTransStatusPese = async (pollUrl) => {
     // console.log(response.data)
 
     const _data = await decryptPayload(response.data.payload);
-    console.log("this is the decrypted data", _data)
+
+
+    // console.log("this is the decrypted data", _data);
+
 
     if (_data.transactionStatus === "PENDING") {
         my_status = _data.transactionStatus;
         setTimeout(async () => {
             await getTransStatusPese(pollUrl)
-        }, 5000);
+        }, 7000);
     } else {
 
         my_status = _data.transactionStatus;
 
     }
-
-
-
 
 }
 
@@ -83,8 +85,11 @@ export const netoneAirtimeControllerV2 = (req, res, next) => {
 
             if (response && response.success) {
 
+
+
                 while (my_status === "PENDING" || my_status === undefined) {
                     await getTransStatusPese(response.pollUrl);
+
                 }
 
                 if (my_status === "FAILED") {
@@ -94,7 +99,7 @@ export const netoneAirtimeControllerV2 = (req, res, next) => {
                     res.json({
                         error: 'err01',
                         message: "Mobile confirmation failed"
-                    })
+                    });
                     // console.log('Ca')
                 }
 

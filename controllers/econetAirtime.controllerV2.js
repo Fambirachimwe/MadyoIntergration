@@ -1,11 +1,10 @@
 import axios from 'axios';
-import { generateAirtimeVendorRefence, nowDate, mobilePay, sendEconetSMS_Airtime } from '../util/util.js'
+import { generateAirtimeVendorRefence, nowDate, sendEconetSMS_Airtime } from '../util/util.js'
 import Airtime from '../models/airtime.js';
 import { vendorNumbers } from '../util/constants.js'
 import { nanoid } from 'nanoid';
-import { load } from 'cheerio';
 import { peseMobilePay } from '../util/pesepayUtil.js';
-import crypto from 'crypto'
+import crypto from 'crypto';
 
 
 const url = process.env.BASE_URL;
@@ -20,6 +19,8 @@ const decryptPayload = async (payload) => {
     let decrypted = decipher.update(payload, 'base64', 'utf8');
     let _obj = decrypted.replaceAll('{&', '{"') + decipher.final('utf8');
     const jsonObject = JSON.parse(_obj);
+
+    // console.log(jsonObject)
 
 
     // return data;
@@ -82,10 +83,6 @@ export const econetAirtimeControllerV2 = async (req, res, next) => {
             // handle the response here
 
             if (response && response.success) {
-                // do {
-                //     console.log(my_status)
-                //     await getTransStatusPese(response.pollUrl);
-                // } while (my_status === "PENDING" || my_status === undefined);
 
                 while (my_status === "PENDING" || my_status === undefined) {
                     await getTransStatusPese(response.pollUrl);
