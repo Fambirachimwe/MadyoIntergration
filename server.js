@@ -55,7 +55,7 @@ app.use('/lifeAssurrence', lifeAssuranceRoutes);
 app.use('/pese', peseRoute)
 
 
-// testing the econet controller V2 
+// testing the airtime controllers V2 
 
 app.use('/v2/econet/buy', econetAirtimeControllerV2);
 app.use('/v2/netone/buy', netoneAirtimeControllerV2);
