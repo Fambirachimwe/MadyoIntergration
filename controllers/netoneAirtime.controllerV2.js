@@ -28,10 +28,10 @@ const decryptPayload = async (payload) => {
 
 
 const getTransStatusPese = async (pollUrl) => {
-
     let config = {
         headers: {
             "authorization": `${process.env.PESE_INTEGRATION_KEY}`,
+            'Content-Type': 'application/json',
         }
     }
 
