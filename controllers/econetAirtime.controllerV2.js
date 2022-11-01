@@ -107,7 +107,7 @@ export const econetAirtimeControllerV2 = async (req, res, next) => {
                     // console.log(my_status)
                     my_status = "";
 
-                    res.json({
+                    return res.json({
                         error: 'err01',
                         message: "Mobile confirmation failed"
                     })
@@ -217,14 +217,14 @@ export const econetAirtimeControllerV2 = async (req, res, next) => {
 
 
             } else {
-                res.json({
+                return res.json({
                     error: "err01",
                     message: "Mobile money confirmation failed"
                 })
             }
 
         }).catch(err => {
-            res.send(err)
+            return res.send(err.response)
         });
 
 
