@@ -1,17 +1,13 @@
 import axios from 'axios';
-import { generateAirtimeVendorRefence, nowDate, mobilePay, sendEconetSMS_Airtime } from '../util/util.js'
-import Airtime from '../models/airtime.js';
-import { vendorNumbers } from '../util/constants.js'
-import { nanoid } from 'nanoid';
+import { generateAirtimeVendorRefence, mobilePay, nowDate, smsGateway } from '../util/util.js'
+import Airtime from '../models/airtime.js'
+import { nanoid } from 'nanoid'
+import { vendorNumbers } from '../util/constants.js';
 import { load } from 'cheerio';
-import { peseMobilePay } from '../util/pesepayUtil.js';
-import crypto from 'crypto'
 
 
 const url = process.env.BASE_URL;
-// this is our source  account phonenumber .... represents us as the merchant
-const econetSouceMobile = "263772978751";
-
+const netoneSouceMobile = "263719403033"
 var my_status;
 
 const decryptPayload = async (payload) => {
@@ -62,30 +58,30 @@ const getTransStatusPese = async (pollUrl) => {
 
 
 
-export const econetAirtimeControllerV2 = async (req, res, next) => {
+
+export const netoneAirtimeControllerV2 = (req, res, next) => {
 
     // source mobile is the line which airtime is going to be deducted
     const { amount, targetMobile, payingNumber } = req.body;
     const cents = amount * 100;
     // validate if the paying number and the targetMobile is an econet phone number
-    const econet = /^077|^078/;   // regex for econet phone number
-    const netone = /^071/;
+    const netone = /^071/;   // regex for econet phone number
+    const econet = /^077|^078/;
     let method;
 
     // check if the paying number is an ecocash or onemoney number
     if (econet.test(payingNumber)) { method = 'ecocash' }
     if (netone.test(payingNumber)) { method = 'onemoney' }
 
+
+
+    // first make payment using ecocash
     peseMobilePay(amount, "ZWL", "PZW201", payingNumber)
 
         .then(async response => {
             // handle the response here
 
             if (response && response.success) {
-                // do {
-                //     console.log(my_status)
-                //     await getTransStatusPese(response.pollUrl);
-                // } while (my_status === "PENDING" || my_status === undefined);
 
                 while (my_status === "PENDING" || my_status === undefined) {
                     await getTransStatusPese(response.pollUrl);
@@ -104,24 +100,23 @@ export const econetAirtimeControllerV2 = async (req, res, next) => {
 
                 else if (my_status === "SUCCESS") {
 
-                    console.log("ecocash transaction completed")
-
-
+                    console.log("ecocash transaction completed");
 
                     axios.post(`${url}`,
                         {
                             "mti": "0200",
-                            "vendorReference": generateAirtimeVendorRefence("econet"),
+                            "vendorReference": generateAirtimeVendorRefence("netone"),
                             "processingCode": "U50000",
                             "vendorNumber": vendorNumbers._liveVendorNumber,
                             "transactionAmount": cents,
-                            "sourceMobile": econetSouceMobile,
+                            "sourceMobile": netoneSouceMobile,
                             "targetMobile": `263${targetMobile.slice(1)}`,
                             "utilityAccount": `263${targetMobile.slice(1)}`,
-                            "merchantName": "ECONET",
-                            "productName": "ECONET_AIRTIME",
+                            "merchantName": "NETONE",
+                            "productName": "NETONE_AIRTIME",
                             "transmissionDate": nowDate(),
                             "currencyCode": "ZWL",
+                            "serviceId": "CS"
 
                         },
                         {
@@ -144,9 +139,9 @@ export const econetAirtimeControllerV2 = async (req, res, next) => {
                                 new Airtime({
                                     orderNumber: nanoid(10),
                                     vendorReference: vendorReference,
-                                    type: "econet",
+                                    type: "netone",
                                     amount: transactionAmount / 100,
-                                    status: "success",
+                                    status: "failed",
                                     utilityAccount: utilityAccount,
                                     narrative: narrative,
                                     currencyCode, currencyCode,
@@ -189,7 +184,7 @@ export const econetAirtimeControllerV2 = async (req, res, next) => {
 
                                         // sendSMS(`${targetMobile}`, data.data)
                                         // using the Madyo sms gateway
-                                        sendEconetSMS_Airtime(transactionAmount / 100, `${targetMobile}`)
+                                        smsGateway(`Airtime Credited with $${transactionAmount / 100}00`, targetMobile);
                                     })
 
                                 res.send(data.data)
@@ -216,12 +211,4 @@ export const econetAirtimeControllerV2 = async (req, res, next) => {
 
 
 
-
 }
-
-
-
-
-
-
-
