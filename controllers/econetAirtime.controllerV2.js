@@ -84,6 +84,8 @@ export const econetAirtimeControllerV2 = async (req, res, next) => {
 
             if (response && response.success) {
 
+                console.log(response)
+
                 while (my_status === "PENDING" || my_status === undefined) {
                     await getTransStatusPese(response.pollUrl);
                 }
