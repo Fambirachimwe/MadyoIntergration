@@ -20,7 +20,7 @@ const decryptPayload = async (payload) => {
     let _obj = decrypted.replaceAll('{&', '{"') + decipher.final('utf8');
     const jsonObject = JSON.parse(_obj);
 
-    // console.log(jsonObject)
+    console.log(jsonObject)
 
 
     // return data;
