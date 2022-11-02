@@ -1,21 +1,13 @@
 import 'dotenv/config';
 import express from 'express';
-import axios from 'axios';
+
 
 
 import { econetAirtimeController } from '../controllers/econetAirtime.controller.js'
 import { netoneAirtimeController } from '../controllers/netoneAirtime.controller.js';
 import { telecelAirtimeController } from '../controllers/telecelAirtime.controller.js';
 
-
-
-
 const router = express.Router();
-const url = process.env.BASE_URL;
-
-const econetSourceMobile = "263772978751";
-const netoneSouceMobile = ""
-const telecelSourveMobile = ""
 
 /**
  * Transmission Date Format: MMDDYYHHmmss Description: The date and time when the message is sent. 
