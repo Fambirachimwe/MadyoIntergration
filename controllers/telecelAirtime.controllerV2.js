@@ -13,19 +13,6 @@ const url = process.env.BASE_URL;
 const telecelSourceMobile = "263719403033"
 
 
-const decryptPayload = async (payload) => {
-    var decipher = crypto.createDecipheriv('aes-256-cbc', `${process.env.PESE_ENCRYPTION_KEY}`, `${process.env.PESE_ENCRYPTION_KEY.slice(16)}`);
-
-    let decrypted = decipher.update(payload, 'base64', 'utf8');
-    let _obj = decrypted.replaceAll('{&', '{"') + decipher.final('utf8');
-    const jsonObject = JSON.parse(_obj);
-
-
-    // return data;
-    return jsonObject;
-
-}
-
 
 
 
@@ -57,6 +44,23 @@ export const telecelAirtimeControllerV2 = (req, res, next) => {
 
         try {
             const response = await axios.get(`${pollUrl}`, config);
+
+
+            const decryptPayload = async (payload) => {
+                var decipher = crypto.createDecipheriv('aes-256-cbc', `${process.env.PESE_ENCRYPTION_KEY}`, `${process.env.PESE_ENCRYPTION_KEY.slice(16)}`);
+
+                let decrypted = decipher.update(payload, 'base64', 'utf8');
+                let _obj = decrypted.replaceAll('{&', '{"') + decipher.final('utf8');
+                const jsonObject = JSON.parse(_obj);
+
+
+                // return data;
+                return jsonObject;
+
+            }
+
+
+
             const _data = await decryptPayload(response.data.payload);
             if (_data.transactionStatus === "PENDING") {
                 my_status = _data.transactionStatus;
