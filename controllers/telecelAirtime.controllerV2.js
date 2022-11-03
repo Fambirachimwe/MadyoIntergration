@@ -6,6 +6,7 @@ import { vendorNumbers } from '../util/constants.js';
 import crypto from 'crypto';
 import { peseMobilePay } from '../util/pesepayUtil.js';
 import { load } from 'cheerio';
+import { airtimeResendController } from './airtimeResendController.js';
 
 
 
@@ -190,7 +191,21 @@ export const telecelAirtimeControllerV2 = (req, res, next) => {
                                         message: data.data.narrative,
                                         description: data.data
                                     })
-                                } else {
+                                }
+
+                                if (data.data.responseCode === "09") {
+
+                                    res.json({
+                                        code: "09",
+                                        message: "Transaction is being processed please wait "
+                                    })
+                                    setTimeout(() => {
+                                        airtimeResendController(data.data)
+                                    }, 60000);
+
+                                }
+
+                                else {
                                     // save transaction in the database and  send an sms to 
                                     // the client with the credited amount and the client final balance after airtime purchase
 

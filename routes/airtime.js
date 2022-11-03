@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import express from 'express';
+// import { airtimeResendController } from '../controllers/airtimeResendController.js';
 
 
 
@@ -19,6 +20,8 @@ router.post(`/econet/buy`, econetAirtimeController);
 router.post(`/netone/buy`, netoneAirtimeController);
 
 router.post(`/telecel/buy`, telecelAirtimeController);
+
+// router.post('/resend', airtimeResendController)
 
 
 

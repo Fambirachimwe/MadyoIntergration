@@ -5,6 +5,7 @@ import { vendorNumbers } from '../util/constants.js'
 import { nanoid } from 'nanoid';
 import { peseMobilePay } from '../util/pesepayUtil.js';
 import crypto from 'crypto';
+import { airtimeResendController } from './airtimeResendController.js';
 
 const url = process.env.BASE_URL;
 const econetSouceMobile = "263772978751";
@@ -67,7 +68,7 @@ export const econetAirtimeControllerV2 = async (req, res, next) => {
                 return
             }
         } catch (error) {
-            my_status = "FAILED";
+            my_status = "PENDING";
             console.log(error.response)
         }
     }
@@ -154,6 +155,8 @@ export const econetAirtimeControllerV2 = async (req, res, next) => {
                         )
                             .then(data => {
 
+
+
                                 const { vendorReference, transactionAmount, utilityAccount, narrative, currencyCode, sourceMobile, targetMobile, transmissionDate } = data.data;
                                 // console.log(data.data)
                                 if (data.data.responseCode === "05") {
@@ -181,7 +184,21 @@ export const econetAirtimeControllerV2 = async (req, res, next) => {
                                         message: data.data.narrative,
                                         description: data.data
                                     })
-                                } else {
+                                }
+                                // check it the reponseCode = 09
+                                if (data.data.responseCode === "09") {
+
+                                    res.json({
+                                        code: "09",
+                                        message: "Transaction is being processed please wait "
+                                    })
+                                    setTimeout(() => {
+                                        airtimeResendController(data.data)
+                                    }, 60000);
+
+                                }
+
+                                else {
                                     // save transaction in the database and  send an sms to 
                                     // the client with the credited amount and the client final balance after airtime purchase
 

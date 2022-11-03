@@ -275,35 +275,34 @@ export const tokenResend = (data) => {
 
 }
 
-export var my_status;
-export const getTransactioStatus = async (_polUrl) => {
-    const response = await axios.get(_polUrl);
-    const $ = load(response.data);
-    const splited = $('body').text().split('&')
-    let reference, paynowReference, amount, status, polUrl, hash;
+export const airtimeResend = (data) => {
 
-    reference = splited[0].split('=')[1].replaceAll('%', ' ');
-    paynowReference = splited[1].split('=')[1].replaceAll('%', ' ');
-    amount = splited[2].split('=')[1].replaceAll('%', ' ');
-    status = splited[3].split('=')[1].replaceAll('%', ' ');
-    polUrl = splited[4].split('=')[1].replaceAll('%', ' ');
-    hash = splited[5].split('=')[1].replaceAll('%', ' ');
+    // console.log(data)
 
-    if (status === "Sent") {
-        my_status = status;
-        console.log(status)
+    return axios.post(`${apiUrl}/airtime/resend`,
 
-        setTimeout(() => {
-            getTransactioStatus(_polUrl)
-        }, 5000);
+        // payload
 
-    } else {
+        {
+            "mti": "0201",
+            "vendorReference": data.vendorReference(),
+            "processingCode": "U50000",
+            "vendorNumber": data.vendorNumber,
+            "utilityAccount": data.utilityAccount,
+            "transactionAmount": data.transactionAmount,
+            "transmissionDate": nowDate(),
+            "originalReference": data.vendorReference,
+            "merchantName": "ECONET",
+            "productName": "ECONET_AIRTIME",
+            "currencyCode": "ZWL"
+        },
+        // auth object
 
-        console.log('chage the status', status);
-        my_status = status;
-        // return transactionStatus;
-    }
+    )
+
+
 }
+
 
 
 
