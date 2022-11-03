@@ -58,7 +58,9 @@ export const econetAirtimeControllerV2 = async (req, res, next) => {
 
 
             const _data = await decryptPayload(response.data.payload);
+
             if (_data.transactionStatus === "PENDING") {
+
                 my_status = _data.transactionStatus;
                 setTimeout(async () => {
                     await getTransStatusPese(pollUrl)
