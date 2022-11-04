@@ -232,7 +232,8 @@ export const telecelAirtimeControllerV2 = (req, res, next) => {
 
                                             // sendSMS(`${targetMobile}`, data.data)
                                             // using the Madyo sms gateway
-                                            smsGateway(`Airtime Credited with $${transactionAmount / 100}00`, targetMobile);
+                                            const _transactionAmount = transactionAmount / 100;
+                                            smsGateway(`Airtime Credited with $${_transactionAmount}00`, targetMobile);
                                         })
 
                                     res.send(data.data)

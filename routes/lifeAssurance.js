@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import express, { response } from 'express';
+import express from 'express';
 import axios from 'axios';
 import { generatePolicyVendorRefence, getCustomerPolicy, nowDate } from '../util/util.js'
 import { vendorNumbers } from '../util/constants.js';

@@ -78,6 +78,14 @@ export const generateZesaVendorRefence = () => {
 
 }
 
+export const generateTeloneVendorRefence = () => {
+
+    let reference = 'TELONE';
+    const newRef = reference + randomString(16, 'aA')
+    return newRef;
+
+}
+
 
 export const generatePolicyVendorRefence = () => {
 
