@@ -5,6 +5,7 @@ import { vendorNumbers } from "../util/constants.js";
 import { peseMobilePay } from "../util/pesepayUtil.js";
 import { generateZesaVendorRefence, sendZesaToken, tokenResend, nowDate, } from "../util/util.js";
 import crypto from 'crypto';
+import { addPayment } from "../util/paymentUtil.js";
 
 
 
@@ -59,6 +60,8 @@ export const buyToken = (req, res, next) => {
     const econet = /^077|^078/;
     let method;
     var my_status;
+
+    const orderNumber = nanoid(10)
 
     if (econet.test(payingNumber)) { method = 'ecocash' }
     if (netone.test(payingNumber)) { method = 'onemoney' }
@@ -175,6 +178,7 @@ export const buyToken = (req, res, next) => {
                         }
                         if (my_status === "FAILED") {
                             // console.log(my_status)
+                            addPayment('pese', amount, 'zesa', "failed", orderNumber, method)
                             my_status = "";
                             return res.json({
                                 error: 'err01',
@@ -186,6 +190,7 @@ export const buyToken = (req, res, next) => {
                         else if (my_status === "SUCCESS") {
 
                             console.log("ecocash transaction completed");
+                            addPayment('pese', amount, 'zesa', "success", orderNumber, method)
 
                             axios.post(`${url}`,
                                 //  pass this data in the body of the api 
@@ -366,6 +371,8 @@ export const buyToken = (req, res, next) => {
 
                     if (my_status === "Cancelled") {
 
+                        addPayment('paynow', amount, 'zesa', "failed", orderNumber, method)
+
                         my_status = "";
                         return res.json({
                             error: 'err01',
@@ -375,6 +382,10 @@ export const buyToken = (req, res, next) => {
                     }
 
                     else if (my_status === "Paid") {
+
+                        addPayment('pese', amount, 'zesa', "success", orderNumber, method);
+
+
                         axios.post(`${url}`,
                             //  pass this data in the body of the api 
                             {
