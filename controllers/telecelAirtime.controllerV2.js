@@ -7,11 +7,14 @@ import crypto from 'crypto';
 import { peseMobilePay } from '../util/pesepayUtil.js';
 import { load } from 'cheerio';
 import { airtimeResendController } from './airtimeResendController.js';
+import { addPayment } from '../util/paymentUtil.js';
 
 
 
 const url = process.env.BASE_URL;
 const telecelSourceMobile = "263719403033"
+
+const orderNumber = nanoid(10);
 
 
 
@@ -124,7 +127,8 @@ export const telecelAirtimeControllerV2 = (req, res, next) => {
 
                     if (my_status === "FAILED") {
 
-                        console.log(my_status)
+                        addPayment('pese', amount, 'econet airtime', "failed", orderNumber, method);
+                        my_status = "";
 
                         res.json({
                             error: 'err01',
@@ -136,6 +140,10 @@ export const telecelAirtimeControllerV2 = (req, res, next) => {
                     else if (my_status === "SUCCESS") {
 
                         console.log("ecocash transaction completed");
+
+                        // save the payment  in the database here 
+                        addPayment('pese', amount, 'econet airtime', "success", orderNumber, method);
+
 
                         axios.post(`${url}`,
                             {
@@ -272,6 +280,9 @@ export const telecelAirtimeControllerV2 = (req, res, next) => {
 
                     if (my_status === "Cancelled") {
 
+                        // save the payment  in the database here 
+                        addPayment('paynow', amount, 'econet airtime', "failed", orderNumber, method);
+
                         return res.json({
                             error: 'err01',
                             message: "Mobile money confirmation failed"
@@ -282,6 +293,9 @@ export const telecelAirtimeControllerV2 = (req, res, next) => {
                         console.log('mobile money transaction complete')
                         // continue the transaction here
                         // make a post request to the esolutions API
+                        // save the payment  in the database here 
+                        addPayment('paynow', amount, 'econet airtime', "success", orderNumber, method);
+
                         axios.post(`${url}`,
                             {
                                 "mti": "0200",

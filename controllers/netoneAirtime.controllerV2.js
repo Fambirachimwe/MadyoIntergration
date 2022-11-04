@@ -6,6 +6,7 @@ import { vendorNumbers } from '../util/constants.js';
 import { peseMobilePay } from '../util/pesepayUtil.js';
 import crypto from 'crypto';
 import { airtimeResendController } from './airtimeResendController.js';
+import { addPayment } from '../util/paymentUtil.js';
 
 const url = process.env.BASE_URL;
 const netoneSouceMobile = "263719403033"
@@ -124,6 +125,8 @@ export const netoneAirtimeControllerV2 = (req, res, next) => {
                     }
 
                     if (my_status === "FAILED") {
+                        // save the payment to the database
+                        addPayment('pese', amount, 'econet airtime', "failed", orderNumber, method)
 
                         console.log(my_status);
 
@@ -139,6 +142,9 @@ export const netoneAirtimeControllerV2 = (req, res, next) => {
                     else if (my_status === "SUCCESS") {
 
                         console.log("ecocash transaction completed");
+                        // save the payment  in the database here 
+                        addPayment('pese', amount, 'econet airtime', "success", orderNumber, method);
+
 
                         axios.post(`${url}`,
                             {
@@ -271,6 +277,10 @@ export const netoneAirtimeControllerV2 = (req, res, next) => {
 
                 if (my_status === "Cancelled") {
 
+                    // save the payment  in the database here 
+                    addPayment('paynow', amount, 'econet airtime', "failed", orderNumber, method);
+
+
                     return res.json({
                         error: 'err01',
                         message: "Mobile confirmation failed"
@@ -281,6 +291,10 @@ export const netoneAirtimeControllerV2 = (req, res, next) => {
                     console.log('ecocash transaction complete')
                     // continue the transaction here
                     // make a post request to the esolutions API
+
+                    // save the payment  in the database here 
+                    addPayment('paynow', amount, 'econet airtime', "success", orderNumber, method);
+
                     axios.post(`${url}`,
                         {
                             "mti": "0200",

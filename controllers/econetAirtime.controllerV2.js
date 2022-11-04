@@ -6,6 +6,7 @@ import { nanoid } from 'nanoid';
 import { peseMobilePay } from '../util/pesepayUtil.js';
 import crypto from 'crypto';
 import { airtimeResendController } from './airtimeResendController.js';
+import { addPayment } from '../util/paymentUtil.js';
 
 const url = process.env.BASE_URL;
 const econetSouceMobile = "263772978751";
@@ -25,9 +26,11 @@ export const econetAirtimeControllerV2 = async (req, res, next) => {
     const netone = /^071/;
     let method;
     var my_status;
+    const orderNumber = nanoid(10);
 
     if (econet.test(payingNumber)) { method = 'ecocash' }
     if (netone.test(payingNumber)) { method = 'onemoney' }
+
 
     // console.log(method)
 
@@ -112,6 +115,8 @@ export const econetAirtimeControllerV2 = async (req, res, next) => {
     if (method === "ecocash") {
 
 
+
+
         peseMobilePay(amount, "ZWL", "PZW201", payingNumber)
 
             .then(async response => {
@@ -122,6 +127,8 @@ export const econetAirtimeControllerV2 = async (req, res, next) => {
                     }
                     if (my_status === "FAILED") {
                         // console.log(my_status)
+                        // save the payment to the database
+                        addPayment('pese', amount, 'econet airtime', "failed", orderNumber, method)
                         my_status = "";
                         return res.json({
                             error: 'err01',
@@ -130,7 +137,11 @@ export const econetAirtimeControllerV2 = async (req, res, next) => {
                         // console.log('Ca')
                     }
                     else if (my_status === "SUCCESS") {
-                        console.log("ecocash transaction completed")
+                        console.log("ecocash transaction completed");
+                        // save the payment  in the database here 
+                        addPayment('pese', amount, 'econet airtime', "success", orderNumber, method);
+
+
                         axios.post(`${url}`,
                             {
                                 "mti": "0200",
@@ -166,7 +177,7 @@ export const econetAirtimeControllerV2 = async (req, res, next) => {
                                     // save the failed transaction in the database
                                     //  save the airtime transaction in the database 
                                     new Airtime({
-                                        orderNumber: nanoid(10),
+                                        orderNumber: orderNumber,
                                         vendorReference: vendorReference,
                                         type: "econet",
                                         amount: transactionAmount / 100,
@@ -177,7 +188,8 @@ export const econetAirtimeControllerV2 = async (req, res, next) => {
                                         sourceMobile: sourceMobile,
                                         targetMobile: targetMobile,
                                         date: transmissionDate
-                                    }).save();
+                                    }).save()
+
 
                                     // res.send(data.data)
                                     console.log("General Error.. response code 05")
@@ -195,7 +207,8 @@ export const econetAirtimeControllerV2 = async (req, res, next) => {
                                         message: "Transaction is being processed please wait "
                                     })
                                     setTimeout(() => {
-                                        airtimeResendController(data.data)
+                                        airtimeResendController(data.data).then(() => {
+                                        })
                                     }, 60000);
 
                                 }
@@ -260,6 +273,8 @@ export const econetAirtimeControllerV2 = async (req, res, next) => {
                 } while (my_status === "Sent" || my_status === undefined);
 
                 if (my_status === "Cancelled") {
+                    // save the payment  in the database here 
+                    addPayment('paynow', amount, 'econet airtime', "failed", orderNumber, method);
 
                     return res.json({
                         error: 'err01',
@@ -271,6 +286,9 @@ export const econetAirtimeControllerV2 = async (req, res, next) => {
                     console.log('ecocash transaction complete')
                     // continue the transaction here
                     // make a post request to the esolutions API
+                    // save the payment  in the database here 
+                    addPayment('paynow', amount, 'econet airtime', "success", orderNumber, method);
+
                     axios.post(`${url}`,
                         {
                             "mti": "0200",
