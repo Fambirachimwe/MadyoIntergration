@@ -126,7 +126,7 @@ export const netoneAirtimeControllerV2 = (req, res, next) => {
 
                     if (my_status === "FAILED") {
                         // save the payment to the database
-                        addPayment('pese', amount, 'econet airtime', "failed", orderNumber, method)
+                        addPayment('pese', amount, 'netone airtime', "failed", orderNumber, method)
 
                         console.log(my_status);
 
@@ -143,7 +143,7 @@ export const netoneAirtimeControllerV2 = (req, res, next) => {
 
                         console.log("ecocash transaction completed");
                         // save the payment  in the database here 
-                        addPayment('pese', amount, 'econet airtime', "success", orderNumber, method);
+                        addPayment('pese', amount, 'netone airtime', "success", orderNumber, method);
 
 
                         axios.post(`${url}`,
@@ -278,7 +278,7 @@ export const netoneAirtimeControllerV2 = (req, res, next) => {
                 if (my_status === "Cancelled") {
 
                     // save the payment  in the database here 
-                    addPayment('paynow', amount, 'econet airtime', "failed", orderNumber, method);
+                    addPayment('paynow', amount, 'netone airtime', "failed", orderNumber, method);
 
 
                     return res.json({
@@ -293,7 +293,7 @@ export const netoneAirtimeControllerV2 = (req, res, next) => {
                     // make a post request to the esolutions API
 
                     // save the payment  in the database here 
-                    addPayment('paynow', amount, 'econet airtime', "success", orderNumber, method);
+                    addPayment('paynow', amount, 'netone airtime', "success", orderNumber, method);
 
                     axios.post(`${url}`,
                         {

@@ -127,7 +127,7 @@ export const telecelAirtimeControllerV2 = (req, res, next) => {
 
                     if (my_status === "FAILED") {
 
-                        addPayment('pese', amount, 'econet airtime', "failed", orderNumber, method);
+                        addPayment('pese', amount, 'telecel airtime', "failed", orderNumber, method);
                         my_status = "";
 
                         res.json({
@@ -142,7 +142,7 @@ export const telecelAirtimeControllerV2 = (req, res, next) => {
                         console.log("ecocash transaction completed");
 
                         // save the payment  in the database here 
-                        addPayment('pese', amount, 'econet airtime', "success", orderNumber, method);
+                        addPayment('pese', amount, 'telecel airtime', "success", orderNumber, method);
 
 
                         axios.post(`${url}`,
@@ -281,7 +281,7 @@ export const telecelAirtimeControllerV2 = (req, res, next) => {
                     if (my_status === "Cancelled") {
 
                         // save the payment  in the database here 
-                        addPayment('paynow', amount, 'econet airtime', "failed", orderNumber, method);
+                        addPayment('paynow', amount, 'telecel airtime', "failed", orderNumber, method);
 
                         return res.json({
                             error: 'err01',
