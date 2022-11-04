@@ -39,7 +39,7 @@ function Form(){
                     <label for="cf-targetMobile">Mobile Number</label>
                     <input required type="text" name="cf-targetMobile" class="form-control" id="cf-targetMobile" placeholder="Mobile Number">
                 </div>
-                <input type="button" name="data[password]" class="next btn btn-info" value="Next" />
+                <input type="button" name="data[password]" class="next btn btn-success" value="Next" />
             </fieldset>
             <fieldset>
                 <h2> Step 2: Payment using Ecocash or Onemoney </h2>
@@ -104,7 +104,7 @@ function formJs (){
             $("#_submit").click(function(event){
                 event.preventDefault();
                 var type = $("#cf-type").val();
-                var baseUrl = "https://madyointergration-production.up.railway.app";
+                var baseUrl = "https://madyointergration-production.up.railway.app/v2";
                 let ajaxUrl;
                 switch(type){
                     case "econet":
@@ -179,7 +179,7 @@ function formStyles(){
 		// left: 50%;
 		// transform: translate(-50%, -50%);
 		border: 16px solid #f3f3f3; /* Light grey */
-		border-top: 16px solid #3498db; /* Blue */
+		border-top: 16px solid #43b02a; /* Blue */
 		border-radius: 50%;
 		width: 120px;
 		height: 120px;

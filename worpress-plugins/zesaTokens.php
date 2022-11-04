@@ -1,216 +1,354 @@
 <?php
 /*
-Plugin Name: Zesa Token Form
+Plugin Name: ZESA Tokens Multistep Form
 Plugin URI: http://example.com
-Description: AirTime Form
+Description: Multistep Form
 Version: 1.0
 Author: Tatenda Fambirachimwe
 Author URI: https://tatenda-fambirachimwe.web.app/
 */
 
-function zesaResult(){
-    echo '<div id="result">This is the result section of the response</div>';
-}
-
-function zesa_form() {
-
-    echo '<div id="zesa_response"></div>';
-	echo '<form  action="http://localhost:8000/?page_id=87" method="post">';
-	echo '<p>';
-	echo 'Amount (required) <br/>';
-	echo '<input type="text" name="cf-amount" pattern="[a-zA-Z0-9 ]+" value="' . ( isset( $_POST["cf-amount"] ) ? esc_attr( $_POST["cf-amount"] ) : '' ) . '" size="40" />';
-	echo '</p>';
-
-
-	echo '<p>';
-	echo 'Meter Number (required) <br/>';
-	echo '<input type="text" name="cf-meterNumber" pattern="[a-zA-Z0-9 ]+" value="' . ( isset( $_POST["cf-meterNumber"] ) ? esc_attr( $_POST["cf-meterNumber"] ) : '' ) . '" size="40" />';
-	echo '</p>';
-
-
-	echo '<p>';
-	echo 'Phone Number (required) <br/>';
-	echo '<input type="text" name="cf-phoneNumber" pattern="[a-zA-Z0-9 ]+" value="' . ( isset( $_POST["cf-phoneNumber"] ) ? esc_attr( $_POST["cf-phoneNumber"] ) : '' ) . '" size="40" />';
-	echo '</p>';
-
-
-	echo '<p><input type="submit" name="cf-submitted" value="Pay"></p>';
-
-
-	echo '</form>';
-}
-
-
-function alertError($message) {
-      
-    // Display the alert box 
-    // echo "<script>alert('$message');</script>";
-    echo " 
-    <script>
-        Swal.fire({
-            title: 'Error!',
-            text: '$message',
-            icon: 'error',
-            confirmButtonText: 'OK'
-        });
-    </script>
-    ";
-}
-
-
-function alertSuccess2($message) {
-      
-    // Display the alert box 
-    // echo "<script>alert('$message');</script>";
-    echo " 
-    <script>
-        Swal.fire({
-            title: 'Success!',
-            text: '$message',
-            icon: 'success',
-            confirmButtonText: 'OK'
-        });
-    </script>
-    ";
-}
-
-function alertSuccess3($message) {
-      
-    // Display the alert box 
-    // echo "<script>alert('$message');</script>";
-
-    // {"processingCode": "U50000", "transactionAmount": 5000, "transmissionDate": "30920081415", "vendorNumber": "V3003616720091", "transactionReference": "P1584561929472", "responseCode": "00", "arrears": "Debt Recovery|898766677|800|0|7700", "utilityAccount": "41234567890", "narrative": "Transaction Successfully Processed", "paymentType": "PREPAID", "token": "21644392780719203722|41.5|41.5 kWh @ 2.0 $/kWh: : :|POWERT3EMDB1413342|8299|1215|0%", "fixedCharges": "RE Levy (6%)|POWERT3EMDB1413342|486|0|6%", "miscellaneousData": "", "currencyCode": "ZWL", "merchantName": "ZETDC", "productName": "ZETDC_PREPAID" }
-    echo " 
-    <script>
-        Swal.fire({
-            title: 'Success!',
-            html: '
-                'Token: $message->token,  <br>' 
-                'MeterNumber: $message->utilityAccount,  <br>' 
-                'Amount: $message->transactionAmount,  <br>' 
-                ',
-            icon: 'success',
-            confirmButtonText: 'OK'
-        });
-    </script>
-    ";
-}
-
-//TODO: display the response to the frontend
-
-function displayToFrontEnd($responseData){
-    echo '<div>';
-	echo '<p>Zesa token purchase Sucessfull</p>';
-    echo ''.$responseData;
-	echo '</div>';
-}
 
 
 
+function ZesaForm(){
 
+    echo '<div id="loader"></div>';
+    echo '
+   
+    <div class="container border rounded">
 
+        
+        <form id="zesa_form" name="zesa_form" onsub>
+                <fieldset>
+                <h2>Step 1: </h2>
 
-function deliver_mail1() {
+                <div class="form-group">
+                    <label for="cf-meterNumber">Meter Number</label>
+                    <input required type="text" name="cf-meterNumber" class="form-control" id="cf-meterNumber" placeholder="Meter Number">
+                </div>
+                
+                <div class="form-group">
+                    <label for="cf-amount">Amount</label>
+                    <input required type="text" class="form-control" id="cf-amount" placeholder="Amount">
+                    <h5 id="amountcheck" style="color: red;">
+                        **Minimum amount required id $500.00 ZWL
+                    </h5>
+                </div>
 
-	// if the submit button is clicked, send the email
-	if ( isset( $_POST['cf-submitted'] ) ) {
-        // Redirect('http://localhost:8000/?page_id=97', false);
-
-        // header("Location:http://localhost:8000/?page_id=97");
-
-		// sanitize form values
-		$amount   = sanitize_text_field( $_POST["cf-amount"] );
-		$meterNumber = sanitize_text_field( $_POST["cf-meterNumber"] );
-        $phoneNumber = sanitize_text_field( $_POST["cf-phoneNumber"] );
-
-		
-        // get the url to post data to
-        // TODO: change the url of the local server using ngrok
-        $url = "https://3ed7-41-174-78-234.ngrok.io/zesa/buyToken";  // change this to the server deployed URL
-
-        $body = array(
-
-            
-            'amount'    => $amount,
-            'meterNumber'    => $meterNumber,
-            'phoneNumber'    => $phoneNumber,
-            
-        );
-
-        $args = array(
-            'method'    => 'POST',
-            'body'        => $body,
-            'timeout'     => '180',
-        );
-
-        // make a post request to the provided url 
-
-        $response = wp_remote_post( $url, $args );
-        // print_r($response);
-        // echo "<script>console.log('Debug Objects: " .  wp_remote_retrieve_body( $response )  . "' );</script>";
-
-
-        if ( is_wp_error( $response ) ) {
-            $error_message = $response->get_error_message();
-            print_r($error_message);
-            return "Something went wrong: $error_message";
-        } else {
-
-            $_body = wp_remote_retrieve_body( $response );
-         
-
-            if(json_decode(wp_remote_retrieve_body( $response ))->error === "err01"){
-
-                // display to frontend
-                // print_r(json_decode(wp_remote_retrieve_body( $response )));
-
-                // displayToFrontEnd(json_decode(wp_remote_retrieve_body( $response )));
-                alertError(json_decode(wp_remote_retrieve_body( $response ))->message);
+                <div class="form-group">
+                    <label for="cf-targetMobile">Mobile Number</label>
+                    <input required type="text" name="cf-targetMobile" class="form-control" id="cf-targetMobile" placeholder="Mobile Number">
+                </div>
 
                 
-            }
+                <input type="button" id="step1_next" name="data[password]" class="next btn btn-success" value="Next" />
+            </fieldset>
+
+
+            <fieldset>
+                <h2> Step 2: Verify Details </h2>
+
+
+                <table class="table">
+                   
+                    <tbody>
+                        
+                        <tr>
+                        
+                        <td>Details</td>
+                        <td id="details"></td>
+                        
+                        </tr>
+                        <tr>
+                        
+                        <td >Amount</td>
+                        <td id="amount"></td>
+                        </tr>
+                        <tr>
+                        
+                        <td >Meter Number</td>
+                        <td id="meterNumber"></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                
             
-            if(json_decode(wp_remote_retrieve_body( $response ))->error === "09"){
-                // header("Location: http://localhost:8000/?page_id=97");
+                <input type="button" name="previous" class="previous btn btn-secondary" value="Previous" />
+                <input type="button" name="data[password]" class="next btn btn-success" value="Next" />
+               
+            </fieldset>
 
-                // display to frontend
-
-                alertError(json_decode(wp_remote_retrieve_body( $response))->message );
-            }
-
-            if(json_decode(wp_remote_retrieve_body( $response ))->code === "00"){
-                // header("Location: http://localhost:8000/?page_id=97");
-
-                // display to frontend
-
-                // displayToFrontEnd(json_decode(wp_remote_retrieve_body( $response )));
-                alertSuccess(json_decode(wp_remote_retrieve_body( $response )));
-            }
+            <fieldset>
+                <h2> Step 3: Payment using Ecocash or Onemoney </h2>
+                <div class="form-group">
+                    <label for="fName">Ecocash or Onemoney Number</label>
+                    <input type="text" required id="cf-payingNumber" class="form-control" name="data[fName]" id="fName" placeholder="0777 777 777">
+                </div>
             
+                <input type="button" name="previous" class="previous btn btn-secondary" value="Previous" />
+                
+                <input type="submit" required name="submit" id="_submit" class="submit btn btn-success rounded" value="Submit" id="submit_data" />
+            </fieldset>
 
             
-
-            // echo '<div>';
-			// echo '<p>Airtime purchase Sucessfull check your balance.</p>';
-			// echo '</div>';
-            // echo "<script>console.log('Debug Objects: " . wp_remote_retrieve_body( $response ) . "' );</script>";
-
-            // echo '<script> console.log($response) </script>'
-        }
-
-        // redirect to a success page after the post has been made displaying the data
-	}
+            
+                
+        </form>
+  </div>
+   
+    ';
 }
 
-function cf_shortcode1() {
+
+
+
+function ZesaformJs (){
+    echo'
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+
+    <script type="text/javascript">
+
+    $(document).ajaxStart(function(){
+        // Show image container
+        $("#loader").show();
+      });
+    $(document).ajaxComplete(function(){
+        // Hide image container
+        $("#loader").hide();
+    });
+
+        $(document).ready(function(){
+
+
+            // amount validation
+            $("#amountcheck").hide();
+
+            $("#cf-amount").keyup(function(){
+                validateAmount();
+            });
+
+            function validateAmount(){
+                let __amount = $("#cf-amount").val();
+                if(__amount.length == ""){
+                    $("#amountcheck").show();
+                    return false;
+                } else if(__amount < 500){
+                    $("#amountcheck").show();
+                    $("#amountcheck").html("Amount less than the required minimum amount");
+                    return false
+                } else {
+                    $("#amountcheck").hide();
+                }
+            }
+
+            
+            var current = 1,current_step,next_step,steps;
+            steps = $("fieldset").length;
+            
+            $(".next").click(function(){
+                current_step = $(this).parent();
+                next_step = $(this).parent().next();
+                
+                next_step.show();
+                current_step.hide();
+                
+            });
+
+            $(".previous").click(function(){
+                current_step = $(this).parent();
+                next_step = $(this).parent().prev();
+                
+                next_step.show();
+                current_step.hide();
+                
+            });
+            // submit data to the api here
+
+            $("#_submit").click(function(event){
+                event.preventDefault();
+                var type = $("#cf-type").val();
+                var baseUrl = "https://madyointergration-production.up.railway.app/v2/zesa/buyToken";
+                
+
+
+                var data = {
+                    amount: $("#cf-amount").val(),
+                    targetMobile: $("#cf-targetMobile").val(),
+                    payingNumber: $("#cf-payingNumber").val(),
+                    meterNumber: $("#cf-meterNumber").val()
+                };
+
+                
+
+            
+                $.post(baseUrl, data, function(res) {
+                    // $(".loader").css("display", "none");
+                    // console.log(res);
+                    
+                    if(res.error === "err01"){
+                        const message = res.message;
+                        
+                        Swal.fire({
+                            title: "Error!",
+                            text: `Token Purchase Failed`,
+                            icon: "error",
+                            confirmButtonText: "OK"
+                        });
+                    } 
+                    else if(res.responseCode === "00") {
+                        Swal.fire({
+                            title: "Success!",
+                            text: "Transaction processed successfully ",
+                            icon: "success",
+                            confirmButtonText: "OK"
+                        });
+                    }	
+
+                    else if(res.responseCode === "09") {
+                        Swal.fire({
+                            title: "Success!",
+                            text: "Transaction in progress",
+                            icon: "info",
+                            confirmButtonText: "OK"
+                        });
+                    }
+
+                    // display the data to the frontend
+                })
+            });
+
+        });
+
+        
+        
+
+        
+    </script>';
+}
+
+function getCustomer(){
+    echo '
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+
+    <script type="text/javascript">
+
+        $(document).ajaxStart(function(){
+            // Show image container
+            $("#loader").show();
+        });
+        $(document).ajaxComplete(function(){
+            // Hide image container
+            $("#loader").hide();
+        });
+
+        $(document).ready(function(){
+
+            var getCustomerUrl = "https://madyointergration-production.up.railway.app/zesa/getCustomer";
+
+            
+
+            $("#step1_next").click(function(event){
+
+                var _data = {
+                    meterNumber: $("#cf-meterNumber").val()
+                };
+    
+                
+                $.post(getCustomerUrl, _data, function(res){
+                    // console.log(res);
+
+                    if(res.responseCode === "00"){
+                        
+                        $("#details").html(function(){
+                            return res.customerData;
+                        });
+
+                        $("#amount").html(function(){
+                            return $("#cf-amount").val();
+                        });
+
+                        $("#meterNumber").html(function(){
+                            return $("#cf-meterNumber").val();
+                        });
+                        
+                    } else {
+                        Swal.fire({
+                            title: "Error!",
+                            text: `Detail Verification Failed`,
+                            icon: "error",
+                            confirmButtonText: "OK"
+                        });
+                    }
+    
+                })
+            });
+
+            
+
+
+        });
+
+
+    </script>
+
+
+
+    ';
+}
+
+
+
+
+function ZesaformStyles(){
+    echo '<style type="text/css">
+	#zesa_form fieldset:not(:first-of-type) {
+		display: none;
+	}
+
+    #loader {
+        display: none;
+		position: relative;
+		// top: 50%;
+		// left: 50%;
+		// transform: translate(-50%, -50%);
+		border: 16px solid #f3f3f3; /* Light grey */
+		border-top: 16px solid #43b02a; /* Blue */
+		border-radius: 50%;
+		width: 120px;
+		height: 120px;
+		animation: spin 2s linear infinite;
+        z-index: 100;
+	}
+
+    @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+    }
+	
+  </style>';
+}
+
+
+
+function Zesacf_sCode() {
 	ob_start();
-	deliver_mail1();
-    zesaResult();
-	zesa_form();
+	ZesaformStyles();
+	ZesaForm();
+    ZesaformJs();
+    getCustomer();
 
 	return ob_get_clean();
 }
 
-add_shortcode( 'zesa_tokens', 'cf_shortcode1' );
+
+
+add_shortcode( 'Zesa_multiStep_form', 'Zesacf_sCode' );
+
+
+
 
 ?>
