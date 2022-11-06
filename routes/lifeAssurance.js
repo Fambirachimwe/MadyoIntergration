@@ -49,6 +49,11 @@ router.post('/getCustomer', (req, res, next) => {
 
     ).then(data => {
         res.send(data.data)
+    }).catch(err => {
+        res.status(400).json({
+            "error": "faled to get customer infomation check your internet connectivy",
+            err
+        })
     })
 });
 
@@ -57,9 +62,11 @@ router.post('/getCustomer', (req, res, next) => {
 
 router.post('/pay', (req, res, next) => {
 
+    // handle payments here using Pesepay or Paynow 
 
 
-    const { mobileNumber, utilityAccount, balance, numberOfMonths, monthlySubscription } = req.body;
+
+    const { mobileNumber, utilityAccount, numberOfMonths } = req.body;
     let _transactionAmount;
     const url = process.env.BASE_URL;
 
@@ -75,8 +82,8 @@ router.post('/pay', (req, res, next) => {
                 // get customer data 
 
                 const customerData = data.data.customerData.split("|");
-                const monthlyPremium = data.data.amount;
-                const balance = data.data.customerBalance;
+                const monthlyPremium = parseInt(data.data.amount);
+                const balance = parseInt(data.data.customerBalance);
 
                 _transactionAmount = balance ? balance : 0 + (numberOfMonths * monthlyPremium);
 
@@ -90,7 +97,7 @@ router.post('/pay', (req, res, next) => {
                         "transactionAmount": _transactionAmount * 100,
                         "sourceMobile": mobileNumber,
                         "utilityAccount": utilityAccount,
-                        "customerData": `${numberOfMonths}|${monthlySubscription}`,
+                        "customerData": `${numberOfMonths}|${monthlyPremium}`,
                         "merchantName": "NYARADZO",
                         "productName": "NYARADZO",
                         "transmissionDate": nowDate(),
@@ -105,9 +112,21 @@ router.post('/pay', (req, res, next) => {
                         if (response.data.responseCode === "05") {
                             return res.json({
                                 error: "err01",
-                                message: data.data.narrative
+                                message: data.data.narrative,
+                                responseCode: response.data.responseCode
                             })
-                        } else {
+                        }
+
+                        if (response.data.responseCode === "09") {
+                            return res.json({
+                                error: "err01",
+                                message: data.data.narrative,
+                                responseCode: response.data.responseCode
+                            })
+                        }
+
+
+                        else {
 
                             // save the transaction in the database
                             new Life({
@@ -129,13 +148,6 @@ router.post('/pay', (req, res, next) => {
 
             }
         })
-
-    // policy type 
-
-    // const _transactionAmount = balance + (numberOfMonths * monthlySubscription);
-
-
-
 
 })
 

@@ -14,7 +14,7 @@ import telOneRoutes from './routes/telone.js'
 // connection to mongoDB
 //'mongodb://localhost/Madyozw'
 // process.env.RAILWAY_MONGODB_CONNECTION
-mongoose.connect(`${process.env.RAILWAY_MONGODB_CONNECTION}`, { useNewUrlParser: true });
+mongoose.connect(`mongodb://localhost/Madyozw`, { useNewUrlParser: true });
 mongoose.connection.once('open', () => {
     console.log('Connected to Madyozw');
 }).on('error', (error) => {
@@ -24,7 +24,7 @@ mongoose.connection.once('open', () => {
 
 
 const app = express();
-const PORT = process.env.PORT || 5500;
+const PORT = process.env.PORT || 5600;
 
 
 app.use(express.json());

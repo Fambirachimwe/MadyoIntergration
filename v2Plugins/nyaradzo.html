@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="zesaStyles.css">
+    <!-- load jqquery -->
+    <script src="./jquery.min.js"></script>
+    <title>Nyaradzo Payment</title>
+</head>
+
+<body>
+
+    <div class="loader">
+
+        <div class="_loader_circle"></div>
+
+        <h2 class="title">Processing transaction please wait ...</h2>
+    </div>
+
+    <div class="nyaradzo_form">
+        <div class="contents">
+            <div class="fieldset">
+                <div class="nstep1">
+
+                    <div class="title_container">
+                        <h2 class="title">Pay Nyaradzo policy</h2>
+                        <img src="./images/nyaradzo.jpg" alt="" srcset="">
+                    </div>
+
+                    <form>
+
+
+                        <input required type="text" id="n-policyNumber" placeholder="Policy Number">
+
+                        <input required type="number" id="n-months" placeholder="Number of Months to pay">
+
+                        <input required type="text" id="n-mobileNumber" placeholder="Mobile Number">
+
+                        <input required id="next_1" class="next" type="button" value="Next">
+                    </form>
+
+
+                </div>
+            </div>
+
+            <div class="fieldset">
+                <div class="nstep2">
+
+                    <h2 class="title">Verify Details</h2>
+                    <p>Check the details below before making payment</p>
+
+                    <div class="details_container">
+                        <div class="_row">
+                            <p>Customer details</p>
+                            <p id="pdetails" class="_dt"></p>
+                        </div>
+                        <div class="_row">
+                            <p>Policy Number</p>
+                            <p id="policyNumber" class="_dt"></p>
+                        </div>
+                        <div class="_row">
+                            <p>Monthly premium</p>
+                            <p id="pamount" class="_dt"></p>
+                        </div>
+                    </div>
+
+
+                    <div class="btn_container">
+                        <button id="next_2" class="next">Next</button>
+                        <button id="back_2" class="back">Back</button>
+                    </div>
+
+
+                </div>
+            </div>
+
+            <div class="fieldset">
+                <div class="zesa_step3">
+                    <h2 class="title">Confirm Your Payment</h2>
+                    <p>Check the details below befor making payment</p>
+
+                    <div class="zesa_confirmBox">
+                        <p>
+                            You are about to pay $<span id="c_amount"></span>.00 to Nyaradzo for policy <span
+                                id="c_policyNumber"></span>
+                        </p>
+
+                    </div>
+
+                    <h2 class="title">Choose payment method</h2>
+
+                    <button class="zesa_method">
+                        <img src="./images/logo-1-ecocash.png" alt="" srcset="">
+                        or
+                        <img src="./images/logo-2-money-1.png" alt="" srcset="">
+                    </button>
+
+                    <div id="mobileMoneyContainer" class="mobileForm_container">
+                        <p>This will use your Ecocash or OneMoney wallet to pay for this transaction</p>
+                        <h3>Mobile Number</h3>
+
+                        <input required type="text" id="nyaradz-payingNumber" placeholder="Enter Mobile Number">
+                        <button id="npay">Pay</button>
+                        <button id="ncancel">Cancel</button>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+
+    $(document).ajaxStart(function () {
+        // Show image container
+        $(".loader").show();
+    });
+    $(document).ajaxComplete(function () {
+        // Hide image container
+        $(".loader").hide();
+    });
+
+    $(document).ajaxError(function () {
+        // Show image container
+        Swal.fire({
+            title: "Error!",
+            text: `Error While processing data. Check network connectivity`,
+            icon: "error",
+            confirmButtonText: "OK"
+        });
+    });
+
+    $(document).ready(function () {
+
+        $(".nstep2").hide();
+        $(".zesa_step3").hide();
+        $("#mobileMoneyContainer").hide();
+        let policyNumber;
+        let monthsToPay;
+        let mobileNumber;
+        let _policyType = 1;
+
+        function getPolicyHolder() {
+            var policyUrl = "https://madyointergration-production.up.railway.app/lifeAssurrence/getCustomer";
+
+            var pdata = {
+                mobileNumber,
+                utilityAccount: policyNumber,
+                policyType: _policyType
+            }
+
+            $.post(policyUrl, pdata, function (res) {
+                if (res.responseCode === "00") {
+                    $("#pdetails").html(function () {
+                        return res.narrative.split(".")[0]
+                    });
+
+                    $("#policyNumber").html(function () {
+                        return res.utilityAccount
+                    });
+
+                    $("#pamount").html(function () {
+                        return res.amount * monthsToPay;
+                    });
+
+                    $("#c_amount").html(function () {
+                        return res.amount * monthsToPay
+                    });
+
+                    $("#c_policyNumber").html(function () {
+                        return res.utilityAccount
+                    })
+
+                } else {
+                    Swal.fire({
+                        title: "Error!",
+                        text: `Detail Verification Failed`,
+                        icon: "error",
+                        confirmButtonText: "OK"
+                    });
+
+                }
+            })
+        }
+
+
+        $("#next_1").click(function () {
+            $(".nstep1").hide();
+            $(".nstep2").show();
+
+            // get customer
+            // set values
+            policyNumber = $("#n-policyNumber").val();
+            monthsToPay = $("#n-months").val();
+            mobileNumber = $("#n-mobileNumber").val();
+
+
+
+
+            // verify the customer details here
+            getPolicyHolder();
+
+
+
+
+        })
+
+        $("#back_2").click(function () {
+            $(".nstep2").hide();
+            $(".nstep1").show();
+        })
+
+        $("#next_2").click(function () {
+            $(".nstep1").hide();
+            $(".nstep2").hide()
+            $(".zesa_step3").show();
+        });
+
+        $(".zesa_method").click(function () {
+            $("#mobileMoneyContainer").show();
+        });
+
+        $("#ncancel").click(function () {
+            $(".nstep1").show();
+            $(".nstep2").hide();
+            $(".zesa_step3").hide();
+            $("#mobileMoneyContainer").hide();
+        });
+
+        $("#npay").click(function () {
+            const nyaradzoUrl = "https://madyointergration-production.up.railway.app/lifeAssurrence/pay";
+
+            var data = {
+                mobileNumber: mobileNumber,
+                utilityAccount: policyNumber,
+                numberOfMonths: monthsToPay
+            }
+
+
+            $.post(nyaradzoUrl,)
+        })
+
+
+
+
+    })
+
+
+
+</script>
+
+</html>
