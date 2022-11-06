@@ -1,10 +1,12 @@
 import 'dotenv/config';
-import express, { response } from 'express';
+import express from 'express';
 import axios from 'axios';
-import { generatePolicyVendorRefence, getCustomerPolicy, nowDate } from '../util/util.js'
+import { generatePolicyVendorRefence, getCustomerPolicy, mobilePay, nowDate } from '../util/util.js'
 import { vendorNumbers } from '../util/constants.js';
 import Life from "../models/lifeAssurance.js"
 import { nanoid } from 'nanoid';
+import { addPayment } from '../util/paymentUtil.js';
+import { peseMobilePay } from '../util/pesepayUtil.js';
 
 
 const router = express.Router();
@@ -70,6 +72,9 @@ router.post('/pay', (req, res, next) => {
     const { mobileNumber, utilityAccount, numberOfMonths, payingNumber } = req.body;
     let _transactionAmount;
     const url = process.env.BASE_URL;
+
+    const netone = /^071/;   // regex for econet phone number
+    const econet = /^077|^078/;
 
 
     let method;
