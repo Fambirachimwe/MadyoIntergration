@@ -357,7 +357,7 @@ export const buyToken = (req, res, next) => {
         else {
             // make mobile payment here  using paynow
             mobilePay(amount, method, `${payingNumber}`).then(async (response) => {
-                payingNumber
+                // payingNumber
                 // TODO: safe the payment in the database 
 
                 if (response && response.success) {
