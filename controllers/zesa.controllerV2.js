@@ -383,7 +383,7 @@ export const buyToken = (req, res, next) => {
 
                     else if (my_status === "Paid") {
 
-                        addPayment('pese', amount, 'zesa', "success", orderNumber, method);
+                        addPayment('paynow', amount, 'zesa', "success", orderNumber, method);
 
 
                         axios.post(`${url}`,
