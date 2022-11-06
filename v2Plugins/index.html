@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./styles.css">
+
+    <!-- load jqquery -->
+    <script src="./jquery.min.js"></script>
+    <title>Plugins Page</title>
+</head>
+
+<body>
+
+    <a href="/zesa.html">Buy zesa tokens here</a>
+
+    <div class="loader">
+
+        <div class="_loader_circle"></div>
+
+        <h2 class="title">Processing transaction please wait ...</h2>
+    </div>
+
+
+    <div class="airtime_form">
+
+
+
+
+        <div class="contents">
+
+            <div class="fieldset">
+                <div id="step1" class="form_container_1">
+                    <h2 class="title">Mobile Recharge</h2>
+                    <div class="operator_list_container">
+
+
+                        <div class="op_item"><img src="./images/logo-1-ecocash.png" alt="" srcset=""></div>
+                        <div class="op_item"><img src="./images/logo-2-money-1.png" alt="" srcset=""></div>
+                        <div class="op_item">Telecel</div>
+                    </div>
+                    <label for="select_oparator">Select Operator</label>
+                    <form>
+                        <select name="select_oparator" id="cf-type" value="">
+                            <option value="econet">Econet</option>
+                            <option value="netone">Netone</option>
+                            <option value="telecel">Telecel</option>
+                        </select>
+
+                        <input required type="text" id="cf-targetMobile" placeholder="Mobile Number">
+
+                        <input required type="text" id="cf-amount" placeholder="Amount">
+
+                        <input required class="next" type="button" value="Next">
+                    </form>
+                </div>
+
+            </div>
+
+
+
+
+        </div>
+
+        <div class="fieldset">
+            <div id="step2" class="form_container_2">
+                <h2 class="title">Confirm Your Payment</h2>
+                <h5 class="tagline">Check the details below befor making payment</h5>
+
+                <div class="confirmBox">
+                    <p>You're about to topup <span id="confirm_mobileNumber"></span> with ZWL <span
+                            id="confirm_amount"></span> </p>
+                </div>
+
+
+                <div class="payment_method">
+                    <h2 class="title">Choose Payment Method</h2>
+
+                    <button class="method">
+                        <img src="./images/logo-1-ecocash.png" alt="" srcset="">
+                        or
+                        <img src="./images/logo-2-money-1.png" alt="" srcset="">
+                    </button>
+
+                    <div id="mobileMoneyContainer" class="mobileForm_container">
+                        <p>This will use your Ecocash or OneMoney wallet to pay for this transaction</p>
+                        <h3>Mobile Number</h3>
+
+                        <input required type="text" id="cf-payingNumber" placeholder="Enter Mobile Number">
+                        <button id="pay">Pay</button>
+                        <button id="cancel">Cancel</button>
+                    </div>
+                </div>
+
+
+            </div>
+
+        </div>
+
+
+
+    </div>
+
+</body>
+
+<script>
+
+
+    const paymentSelected = false;
+    var step1 = document.getElementById("step1");
+    var step2 = document.getElementById("step2");
+
+    var mobileMoneyContainer = document.getElementById("mobileMoneyContainer");
+
+
+    $(document).ajaxStart(function () {
+        // Show image container
+        $(".loader").show();
+    });
+    $(document).ajaxComplete(function () {
+        // Hide image container
+        $(".loader").hide();
+    });
+
+    $(document).ready(function () {
+        var step = 1, current_step, next_step, steps;
+        steps = $(".fieldset").length;
+
+
+        let amount;
+        let targetMobile;
+        let payingNumber;
+
+
+        $("#step2").hide();
+        $("#mobileMoneyContainer").hide();
+        // $()
+
+        // console.log(steps)
+
+        $(".next").click(function () {
+            current_step = 1;
+            $("#step1").hide();
+            $("#step2").show();
+
+            amount = $("#cf-amount").val();
+            targetMobile = $("#cf-targetMobile").val();
+            payingNumber = $("#cf-payingNumber").val();
+
+
+            $("#confirm_mobileNumber").html(function () {
+                return targetMobile
+            });
+            $("#confirm_amount").html(function () {
+                return amount
+            });
+        });
+
+        $(".method").click(function () {
+            $("#mobileMoneyContainer").show();
+        })
+
+        $("#cancel").click(function () {
+            $("#step1").show();
+
+            $("#step2").hide();
+            $("#mobileMoneyContainer").hide();
+        });
+
+        $("#pay").click(function (event) {
+            //  do the payment logic here 
+            // event.preventDefault();
+            var type = $("#cf-type").val();
+            var baseUrl = "https://madyointergration-production.up.railway.app/v2";
+            let ajaxUrl;
+            switch (type) {
+                case "econet":
+                    ajaxUrl = baseUrl + "/airtime/econet/buy";
+                    break;
+
+                case "netone":
+                    ajaxUrl = baseUrl + "/airtime/netone/buy";
+                    break;
+
+                case "telecel":
+                    ajaxUrl = baseUrl + "/airtime/telecel/buy";
+                    break;
+            }
+
+            payingNumber = $("#cf-payingNumber").val();
+
+            var data = {
+                amount, targetMobile, payingNumber
+            }
+            console.log(data)
+
+
+            $.post(ajaxUrl, data, function (res) {
+                // $(".loader").css("display", "none");
+                console.log(res);
+
+                if (res.error === "err01") {
+                    const message = res.message;
+
+                    Swal.fire({
+                        title: "Error!",
+                        text: `Air time purchase failed`,
+                        icon: "error",
+                        confirmButtonText: "OK"
+                    });
+                } else if (res.responseCode === "00") {
+                    Swal.fire({
+                        title: "Success!",
+                        text: "Transaction processed successfully ",
+                        icon: "success",
+                        confirmButtonText: "OK"
+                    });
+                }
+            })
+
+        })
+
+
+
+    })
+
+
+
+
+
+</script>
+
+</html>

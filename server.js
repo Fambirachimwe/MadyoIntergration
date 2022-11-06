@@ -38,7 +38,15 @@ app.use(express.static('public'))
 
 app.get('/', (req, res, next) => {
     res.sendFile(path.join(__dirname, '/index.html'));
-})
+});
+
+app.get('/ecologo', (req, res, next) => {
+    res.sendFile(path.join(__dirname, '/logo-1-ecocash.png'))
+});
+
+app.get('/onemoneylogo', (req, res, next) => {
+    res.sendFile(path.join(__dirname, '/logo-1-ecocash.png'))
+});
 
 
 // routes for the v1 

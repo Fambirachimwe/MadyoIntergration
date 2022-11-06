@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./zesaStyles.css">
+
+    <!-- load jqquery -->
+    <script src="./jquery.min.js"></script>
+
+    <title>Zesa tokens</title>
+</head>
+
+<body>
+
+    <div class="loader">
+
+        <div class="_loader_circle"></div>
+
+        <h2 class="title">Processing transaction please wait ...</h2>
+    </div>
+
+
+    <div class="zesa_form">
+        <div class="contents">
+            <div class="fieldset">
+                <div class="zesa_step1">
+
+                    <div class="title_container">
+                        <h2 class="title">Purchase ZEDTC tokens</h2>
+                        <img src="./images/payment-2.png" alt="" srcset="">
+                    </div>
+
+                    <form>
+
+
+                        <input required type="text" id="zesa-meterNumber" placeholder="Meter Number">
+
+                        <input required type="text" id="zesa-amount" placeholder="Amount">
+
+                        <input required type="text" id="zesa-mobileNumber" placeholder="Mobile Number">
+
+                        <input required id="next_1" class="next" type="button" value="Next">
+                    </form>
+
+
+
+
+                </div>
+            </div>
+
+            <div class="fieldset">
+                <div class="zesa_step2">
+                    <h2 class="title">Verify Details</h2>
+                    <p>Check the details below befor making payment</p>
+
+                    <div class="details_container">
+                        <div class="_row">
+                            <p>Customer details</p>
+                            <p id="details" class="_dt"></p>
+                        </div>
+                        <div class="_row">
+                            <p>Meter Number</p>
+                            <p id="meterNumber" class="_dt"></p>
+                        </div>
+                        <div class="_row">
+                            <p>Amount</p>
+                            <p id="amount" class="_dt"></p>
+                        </div>
+                    </div>
+
+
+                    <div class="btn_container">
+                        <button id="next_2" class="next">Next</button>
+                        <button id="back_2" class="back">Back</button>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="fieldset">
+                <div class="zesa_step3">
+                    <h2 class="title">Confirm Your Payment</h2>
+                    <p>Check the details below befor making payment</p>
+
+                    <div class="zesa_confirmBox">
+                        <p>
+                            You're about to purchase zetdc token worth $<span id="zesa_confirm_amount"></span>.00
+                        </p>
+
+                    </div>
+
+                    <h2 class="title">Choose payment method</h2>
+
+                    <button class="zesa_method">
+                        <img src="./images/logo-1-ecocash.png" alt="" srcset="">
+                        or
+                        <img src="./images/logo-2-money-1.png" alt="" srcset="">
+                    </button>
+
+                    <div id="mobileMoneyContainer" class="mobileForm_container">
+                        <p>This will use your Ecocash or OneMoney wallet to pay for this transaction</p>
+                        <h3>Mobile Number</h3>
+
+                        <input required type="text" id="zesa-payingNumber" placeholder="Enter Mobile Number">
+                        <button id="pay">Pay</button>
+                        <button id="cancel">Cancel</button>
+                    </div>
+
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</body>
+
+
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+
+    $(document).ajaxStart(function () {
+        // Show image container
+        $(".loader").show();
+    });
+    $(document).ajaxComplete(function () {
+        // Hide image container
+        $(".loader").hide();
+    });
+
+    $(document).ready(function () {
+
+        let meterNumber;
+        let mobileNumber;
+        let amount;
+        let payingNumber;
+
+        function getCustomer() {
+            var getCustomerUrl = "https://madyointergration-production.up.railway.app/zesa/getCustomer";
+
+            var _data = {
+                meterNumber: meterNumber
+            };
+
+            $.post(getCustomerUrl, _data, function (res) {
+                // console.log(res);
+
+                if (res.responseCode === "00") {
+
+                    $("#details").html(function () {
+                        return res.customerData;
+                    });
+
+                    $("#amount").html(function () {
+                        return $("#zesa-amount").val();
+                    });
+
+
+
+                    $("#meterNumber").html(function () {
+                        return $("#zesa-meterNumber").val();
+                    });
+
+                } else {
+                    Swal.fire({
+                        title: "Error!",
+                        text: `Detail Verification Failed`,
+                        icon: "error",
+                        confirmButtonText: "OK"
+                    });
+                }
+
+            })
+
+
+        }
+
+        $(".zesa_step2").hide();
+        $(".zesa_step3").hide();
+        $(".mobileForm_container").hide();
+        // $(".zesa_step2").hide();
+
+        $("#next_1").click(function () {
+            $(".zesa_step1").hide();
+            $(".zesa_step2").show();
+            meterNumber = $("#zesa-meterNumber").val();
+            amount = $("#zesa-amount").val();
+            mobileNumber = $("#zesa-mobileNumber").val();
+            $("#zesa_confirm_amount").html(function () {
+                return amount
+            })
+            getCustomer();
+
+
+        })
+
+        $("#next_2").click(function () {
+            $(".zesa_step2").hide();
+            $(".zesa_step3").show();
+        });
+
+        $("#back_2").click(function () {
+            $(".zesa_step1").show();
+            $(".zesa_step2").hide();
+        });
+
+        $(".zesa_method").click(function () {
+            $(".mobileForm_container").show();
+        });
+
+        $("#cancel").click(function () {
+            $(".zesa_step1").show();
+            $(".zesa_step2").hide();
+            $(".zesa_step3").hide();
+            $(".mobileForm_container").hide();
+        })
+
+        $("#pay").click(function (event) {
+
+            var url = "https://madyointergration-production.up.railway.app/v2/zesa/buyToken";
+
+            payingNumber = $("#zesa-payingNumber").val();
+            var data = {
+                amount, targetMobile: mobileNumber,
+                payingNumber,
+                meterNumber
+            }
+
+            $.post(url, data, function (res) {
+                // $(".loader").css("display", "none");
+                // console.log(res);
+
+                if (res.error === "err01") {
+                    const message = res.message;
+
+                    Swal.fire({
+                        title: "Error!",
+                        text: `Token Purchase Failed`,
+                        icon: "error",
+                        confirmButtonText: "OK"
+                    });
+                }
+                else if (res.responseCode === "00") {
+                    Swal.fire({
+                        title: "Success!",
+                        text: "Transaction processed successfully ",
+                        icon: "success",
+                        confirmButtonText: "OK"
+                    });
+                }
+
+                else if (res.responseCode === "09") {
+                    Swal.fire({
+                        title: "Success!",
+                        text: "Transaction in progress",
+                        icon: "info",
+                        confirmButtonText: "OK"
+                    });
+                }
+
+                // display the data to the frontend
+            })
+
+        })
+
+
+        function getCustomer() {
+            var getCustomerUrl = "https://madyointergration-production.up.railway.app/zesa/getCustomer";
+
+            var _data = {
+                meterNumber: meterNumber
+            };
+
+            $.post(getCustomerUrl, _data, function (res) {
+                // console.log(res);
+
+                if (res.responseCode === "00") {
+
+                    $("#details").html(function () {
+                        return res.customerData;
+                    });
+
+                    $("#amount").html(function () {
+                        return $("#zesa-amount").val();
+                    });
+
+                    $("#meterNumber").html(function () {
+                        return $("#zesa-meterNumber").val();
+                    });
+
+                } else {
+                    Swal.fire({
+                        title: "Error!",
+                        text: `Detail Verification Failed`,
+                        icon: "error",
+                        confirmButtonText: "OK"
+                    });
+                }
+
+            })
+
+
+        }
+
+
+    })
+
+</script>
+
+</html>
