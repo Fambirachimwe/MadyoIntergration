@@ -11,13 +11,6 @@ import path from 'path';
 import lifeAssuranceRoutes from './routes/lifeAssurance.js';
 import telOneRoutes from './routes/telone.js'
 
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
-
-// const __filename = fileURLToPath(import.meta.url);
-// const __dirname = dirname(__filename);
-
-
 // connection to mongoDB
 //'mongodb://localhost/Madyozw'
 // process.env.RAILWAY_MONGODB_CONNECTION
@@ -46,13 +39,6 @@ app.get('/', (req, res, next) => {
     res.sendFile(path.join(__dirname, '/index.html'));
 });
 
-app.get('/ecologo', (req, res, next) => {
-    res.sendFile(path.join(__dirname, '/logo-1-ecocash.png'))
-});
-
-app.get('/onemoneylogo', (req, res, next) => {
-    res.sendFile(path.join(__dirname, '/logo-1-ecocash.png'))
-});
 
 
 // routes for the v1 
