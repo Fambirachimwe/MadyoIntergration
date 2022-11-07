@@ -74,6 +74,8 @@ router.post('/pay', (req, res, next) => {
 
     const { mobileNumber, utilityAccount, numberOfMonths, payingNumber } = req.body;
     let _transactionAmount;
+    let _monthlyPremium;
+    let _balance;
     const url = process.env.BASE_URL;
 
     const netone = /^071/;   // regex for econet phone number
@@ -170,15 +172,17 @@ router.post('/pay', (req, res, next) => {
         }
     }
 
-    const customer = getCustomerPolicy(utilityAccount, mobileNumber, 1);
+    const customer = getCustomerPolicy(utilityAccount, mobileNumber, 1).then(_data => {
+        _monthlyPremium = parseInt(_data.data.amount);
+        _balance = parseInt(_data.data.customerBalance);
+
+        // console.log(monthlyPremium)
+
+        _transactionAmount = _balance ? _balance : 0 + (numberOfMonths * _monthlyPremium);
+
+    })
 
     // const _customerData = data.data.customerData.split("|");
-    const _monthlyPremium = parseInt(customer.data.amount);
-    const _balance = parseInt(customer.data.customerBalance);
-
-    // console.log(monthlyPremium)
-
-    _transactionAmount = _balance ? _balance : 0 + (numberOfMonths * _monthlyPremium);
 
     if (method === "ecocash") {
 
