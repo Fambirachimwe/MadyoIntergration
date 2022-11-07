@@ -331,7 +331,7 @@ export const mobilePay = (amount, method, customerPhoneNumber) => {
         // '0771111111',  // this is a test phone number
 
 
-        `0${customerPhoneNumber}`,
+        `${customerPhoneNumber}`,
         // The mobile money method to use.  ecocash, onemoney, telecel
 
         `${method}`
