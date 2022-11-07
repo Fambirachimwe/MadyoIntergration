@@ -120,23 +120,23 @@ router.post('/pay', async (req, res, next) => {
             const _data = await decryptPayload(response.data.payload);
             // console.log('this is the decrypted data', _data);
 
-            if (_data) {
-                if (_data.transactionStatus === "PENDING") {
-                    my_status = _data.transactionStatus;
-                    setTimeout(async () => {
-                        await getTransStatusPese(pollUrl)
-                    }, 5000);
-                } else {
-                    my_status = _data.transactionStatus;
-                    return
-                }
+
+            if (_data.transactionStatus === "PENDING") {
+                my_status = _data.transactionStatus;
+                setTimeout(async () => {
+                    await getTransStatusPese(pollUrl)
+                }, 5000);
+            } else {
+                my_status = _data.transactionStatus;
+                return
             }
+
 
 
 
         } catch (error) {
             my_status = "PENDING";
-            console.log(error)
+            console.log(error.response)
         }
     }
 
@@ -175,8 +175,9 @@ router.post('/pay', async (req, res, next) => {
 
     // const _payload = customer;
 
-    _monthlyPremium = parseInt(customer.data.amount);
-    _balance = parseInt(customer.data.customerBalance);
+    _monthlyPremium = parseFloat(customer.data.amount).toFixed(2);
+    _balance = parseFloat(customer.data.customerBalance).toFixed(2);
+
 
     _transactionAmount = _balance ? _balance : 0 + (numberOfMonths * _monthlyPremium);
 
@@ -189,7 +190,9 @@ router.post('/pay', async (req, res, next) => {
 
     if (method === "ecocash") {
 
-        peseMobilePay(_transactionAmount, "ZWL", "PZW201", payingNumber)
+        console.log(_transactionAmount)
+
+        peseMobilePay(parseFloat(_transactionAmount).toFixed(2), "ZWL", "PZW201", payingNumber)
             .then(async response => {
 
                 // console.log('pesepay response', response);
@@ -202,7 +205,7 @@ router.post('/pay', async (req, res, next) => {
 
                     if (my_status === "FAILED") {
                         // console.log(my_status)
-                        addPayment('pese', _transactionAmount, 'zesa', "failed", orderNumber, method)
+                        addPayment('pese', _transactionAmount, 'nyaradzo', "failed", orderNumber, method)
                         my_status = "";
                         return res.json({
                             error: 'err01',
@@ -214,7 +217,7 @@ router.post('/pay', async (req, res, next) => {
                     else if (my_status === "SUCCESS") {
 
                         console.log("ecocash transaction completed");
-                        addPayment('pese', amount, 'zesa', "success", orderNumber, method);
+                        addPayment('pese', amount, 'nyaradzo', "success", orderNumber, method);
 
                         axios.post(`${url}`,
                             {
