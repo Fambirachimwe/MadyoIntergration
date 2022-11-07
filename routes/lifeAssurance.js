@@ -211,6 +211,8 @@ router.post('/pay', (req, res, next) => {
                                     const monthlyPremium = parseInt(data.data.amount);
                                     const balance = parseInt(data.data.customerBalance);
 
+                                    console.log(monthlyPremium)
+
                                     _transactionAmount = balance ? balance : 0 + (numberOfMonths * monthlyPremium);
 
                                     console.log(_transactionAmount)
