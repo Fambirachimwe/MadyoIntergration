@@ -170,9 +170,19 @@ router.post('/pay', (req, res, next) => {
         }
     }
 
+    const customer = await getCustomerPolicy(utilityAccount, mobileNumber, 1);
+
+    // const _customerData = data.data.customerData.split("|");
+    const _monthlyPremium = parseInt(customer.data.amount);
+    const _balance = parseInt(customer.data.customerBalance);
+
+    // console.log(monthlyPremium)
+
+    _transactionAmount = _balance ? _balance : 0 + (numberOfMonths * _monthlyPremium);
+
     if (method === "ecocash") {
 
-        peseMobilePay(amount, "ZWL", "PZW201", payingNumber)
+        peseMobilePay(_transactionAmount, "ZWL", "PZW201", payingNumber)
             .then(async response => {
                 if (response && response.success) {
                     while (my_status === "PENDING" || my_status === undefined) {
@@ -211,11 +221,11 @@ router.post('/pay', (req, res, next) => {
                                     const monthlyPremium = parseInt(data.data.amount);
                                     const balance = parseInt(data.data.customerBalance);
 
-                                    console.log(monthlyPremium)
+                                    // console.log(monthlyPremium)
 
                                     _transactionAmount = balance ? balance : 0 + (numberOfMonths * monthlyPremium);
 
-                                    console.log(_transactionAmount)
+                                    // console.log(_transactionAmount)
 
 
 
@@ -289,7 +299,7 @@ router.post('/pay', (req, res, next) => {
             })
     } else {
 
-        mobilePay(amount, method, `${payingNumber}`)
+        mobilePay(_transactionAmount, method, `${payingNumber}`)
             .then(async response => {
 
                 if (response && response.success) {
