@@ -285,7 +285,7 @@ router.post('/pay', async (req, res, next) => {
 
     else {
 
-        mobilePay(_transactionAmount, method, `${payingNumber}`)
+        mobilePay(parseFloat(_transactionAmount).toFixed(2), method, payingNumber)
             .then(async response => {
 
                 if (response && response.success) {
