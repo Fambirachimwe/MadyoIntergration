@@ -213,6 +213,8 @@ router.post('/pay', (req, res, next) => {
 
                                     _transactionAmount = balance ? balance : 0 + (numberOfMonths * monthlyPremium);
 
+                                    console.log(_transactionAmount)
+
 
 
 
