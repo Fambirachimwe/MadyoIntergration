@@ -25,7 +25,7 @@ router.post('/getCustomer', (req, res, next) => {
         productName = "NYARADZO";
         merchantName = "NYARADZO"
 
-    } else {
+    } else if (policyType === 2) {
         productName = "MOONLIGHT";
         merchantName = "MOONLIGHT"
     }
