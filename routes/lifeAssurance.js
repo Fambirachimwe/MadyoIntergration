@@ -6,7 +6,7 @@ import { vendorNumbers } from '../util/constants.js';
 import Life from "../models/lifeAssurance.js"
 import { nanoid } from 'nanoid';
 import { addPayment } from '../util/paymentUtil.js';
-import { peseMobilePay } from '../util/pesepayUtil.js';
+// import { peseMobilePay } from '../util/pesepayUtil.js';
 import crypto from 'crypto';
 import { load } from 'cheerio';
 
@@ -184,7 +184,7 @@ router.post('/pay', async (req, res, next) => {
     if (method === "ecocash") {
 
         console.log(_transactionAmount)
-        mobilePay(_transactionAmount, method, payingNumber)
+        mobilePay(parseFloat(_transactionAmount), method, payingNumber)
             .then(async response => {
 
                 if (response && response.success) {
@@ -303,7 +303,7 @@ router.post('/pay', async (req, res, next) => {
 
     else {
 
-        mobilePay(_transactionAmount, method, payingNumber)
+        mobilePay(parseFloat(_transactionAmount), method, payingNumber)
             .then(async response => {
 
                 if (response && response.success) {
