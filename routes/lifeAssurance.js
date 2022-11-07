@@ -178,11 +178,16 @@ router.post('/pay', async (req, res, next) => {
     _monthlyPremium = parseFloat(customer.data.amount).toFixed(2);
     _balance = parseFloat(customer.data.customerBalance).toFixed(2);
 
+    // console.log(typeof (_monthlyPremium))
+    // console.log(typeof (_balance))
+    // console.log(typeof (numberOfMonths))
 
-    _transactionAmount = _balance ? _balance : 0 + (numberOfMonths * _monthlyPremium);
 
 
-    // console.log(_transactionAmount)
+    _transactionAmount = (numberOfMonths * parseFloat(_monthlyPremium)) + parseFloat(_balance);
+
+
+    console.log(typeof (_transactionAmount))
 
 
 
