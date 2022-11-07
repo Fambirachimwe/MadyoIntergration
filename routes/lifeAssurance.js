@@ -21,6 +21,8 @@ router.post('/getCustomer', (req, res, next) => {
     let productName;
     let merchantName;
 
+    console.log(policyType);
+
     if (policyType === 1) {
         productName = "NYARADZO";
         merchantName = "NYARADZO"
