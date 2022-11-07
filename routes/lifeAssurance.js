@@ -7,6 +7,7 @@ import Life from "../models/lifeAssurance.js"
 import { nanoid } from 'nanoid';
 import { addPayment } from '../util/paymentUtil.js';
 import { peseMobilePay } from '../util/pesepayUtil.js';
+import crypto from 'crypto';
 
 
 const router = express.Router();
@@ -66,11 +67,9 @@ router.post('/getCustomer', (req, res, next) => {
 
 // make payment
 
-router.post('/pay', (req, res, next) => {
+router.post('/pay', async (req, res, next) => {
 
     // handle payments here using Pesepay or Paynow 
-
-
 
     const { mobileNumber, utilityAccount, numberOfMonths, payingNumber } = req.body;
     let _transactionAmount;
@@ -136,7 +135,7 @@ router.post('/pay', (req, res, next) => {
 
 
         } catch (error) {
-            my_status = "FAILED";
+            my_status = "PENDING";
             console.log(error)
         }
     }
@@ -172,15 +171,19 @@ router.post('/pay', (req, res, next) => {
         }
     }
 
-    const customer = getCustomerPolicy(utilityAccount, mobileNumber, 1).then(_data => {
-        _monthlyPremium = parseInt(_data.data.amount);
-        _balance = parseInt(_data.data.customerBalance);
+    const customer = await getCustomerPolicy(utilityAccount, mobileNumber, 1)
 
-        // console.log(monthlyPremium)
+    // const _payload = customer;
 
-        _transactionAmount = _balance ? _balance : 0 + (numberOfMonths * _monthlyPremium);
+    _monthlyPremium = parseInt(customer.data.amount);
+    _balance = parseInt(customer.data.customerBalance);
 
-    })
+    _transactionAmount = _balance ? _balance : 0 + (numberOfMonths * _monthlyPremium);
+
+
+    // console.log(_transactionAmount)
+
+
 
     // const _customerData = data.data.customerData.split("|");
 
@@ -188,6 +191,8 @@ router.post('/pay', (req, res, next) => {
 
         peseMobilePay(_transactionAmount, "ZWL", "PZW201", payingNumber)
             .then(async response => {
+
+                // console.log('pesepay response', response);
                 if (response && response.success) {
                     while (my_status === "PENDING" || my_status === undefined) {
 
@@ -197,7 +202,7 @@ router.post('/pay', (req, res, next) => {
 
                     if (my_status === "FAILED") {
                         // console.log(my_status)
-                        addPayment('pese', amount, 'zesa', "failed", orderNumber, method)
+                        addPayment('pese', _transactionAmount, 'zesa', "failed", orderNumber, method)
                         my_status = "";
                         return res.json({
                             error: 'err01',
@@ -211,97 +216,71 @@ router.post('/pay', (req, res, next) => {
                         console.log("ecocash transaction completed");
                         addPayment('pese', amount, 'zesa', "success", orderNumber, method);
 
-                        getCustomerPolicy(utilityAccount, mobileNumber, 1)
-                            .then(data => {
-                                if (data.data.responseCode === "05") {
-                                    res.json({
+                        axios.post(`${url}`,
+                            {
+                                "mti": "0200",
+                                "vendorReference": generatePolicyVendorRefence(),
+                                "processingCode": "U50000",
+                                "vendorNumber": vendorNumbers._liveVendorNumber,
+                                "amount": _transactionAmount * 100,
+                                "transactionAmount": _transactionAmount * 100,
+                                "sourceMobile": mobileNumber,
+                                "utilityAccount": utilityAccount,
+                                "customerData": `${numberOfMonths}|${monthlyPremium}`,
+                                "merchantName": "NYARADZO",
+                                "productName": "NYARADZO",
+                                "transmissionDate": nowDate(),
+                                "currencyCode": "ZWL"
+                            }
+                            , {
+                                auth: {
+                                    username: process.env.API_USERNAME,
+                                    password: process.env.API_PASSWORD
+                                }
+                            }).then(response => {
+                                if (response.data.responseCode === "05") {
+                                    return res.json({
                                         error: "err01",
-                                        message: "Failed to verify policy number"
+                                        message: data.data.narrative,
+                                        responseCode: response.data.responseCode
                                     })
-                                } else {
-                                    // get customer data 
+                                }
 
-                                    const customerData = data.data.customerData.split("|");
-                                    const monthlyPremium = parseInt(data.data.amount);
-                                    const balance = parseInt(data.data.customerBalance);
-
-                                    // console.log(monthlyPremium)
-
-                                    _transactionAmount = balance ? balance : 0 + (numberOfMonths * monthlyPremium);
-
-                                    // console.log(_transactionAmount)
+                                if (response.data.responseCode === "09") {
+                                    return res.json({
+                                        error: "err01",
+                                        message: data.data.narrative,
+                                        responseCode: response.data.responseCode
+                                    })
+                                }
 
 
+                                else {
 
+                                    // save the transaction in the database
+                                    new Life({
+                                        ...response.data
+                                    }).save()
+                                        .then(data => {
+                                            res.json({
+                                                message: "transaction successfull",
+                                                payload: data
 
-                                    axios.post(`${url}`,
-                                        {
-                                            "mti": "0200",
-                                            "vendorReference": generatePolicyVendorRefence(),
-                                            "processingCode": "U50000",
-                                            "vendorNumber": vendorNumbers._liveVendorNumber,
-                                            "amount": _transactionAmount * 100,
-                                            "transactionAmount": _transactionAmount * 100,
-                                            "sourceMobile": mobileNumber,
-                                            "utilityAccount": utilityAccount,
-                                            "customerData": `${numberOfMonths}|${monthlyPremium}`,
-                                            "merchantName": "NYARADZO",
-                                            "productName": "NYARADZO",
-                                            "transmissionDate": nowDate(),
-                                            "currencyCode": "ZWL"
-                                        }
-                                        , {
-                                            auth: {
-                                                username: process.env.API_USERNAME,
-                                                password: process.env.API_PASSWORD
-                                            }
-                                        }).then(response => {
-                                            if (response.data.responseCode === "05") {
-                                                return res.json({
-                                                    error: "err01",
-                                                    message: data.data.narrative,
-                                                    responseCode: response.data.responseCode
-                                                })
-                                            }
-
-                                            if (response.data.responseCode === "09") {
-                                                return res.json({
-                                                    error: "err01",
-                                                    message: data.data.narrative,
-                                                    responseCode: response.data.responseCode
-                                                })
-                                            }
-
-
-                                            else {
-
-                                                // save the transaction in the database
-                                                new Life({
-                                                    ...response.data
-                                                }).save()
-                                                    .then(data => {
-                                                        res.json({
-                                                            message: "transaction successfull",
-                                                            payload: data
-
-                                                        })
-                                                    })
-
-                                            }
-                                        }
-                                        )
-
-
+                                            })
+                                        })
 
                                 }
-                            })
+                            }
+                            )
 
 
                     }
 
                 }
             })
-    } else {
+    }
+
+    else {
 
         mobilePay(_transactionAmount, method, `${payingNumber}`)
             .then(async response => {
@@ -317,7 +296,7 @@ router.post('/pay', (req, res, next) => {
 
                     if (my_status === "Cancelled") {
 
-                        addPayment('paynow', amount, 'zesa', "failed", orderNumber, method)
+                        addPayment('paynow', _transactionAmount, 'zesa', "failed", orderNumber, method)
 
                         my_status = "";
                         return res.json({

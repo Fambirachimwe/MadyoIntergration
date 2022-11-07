@@ -19,6 +19,7 @@
     "mongoose": "^6.6.5",
     "mongoose-trigger": "^1.0.1",
     "nanoid": "^4.0.0",
+    "node-fetch": "^3.2.10",
     "paynow": "^1.0.9",
     "pesepay": "^1.0.3",
     "sweetalert2": "^11.5.2",
