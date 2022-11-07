@@ -184,7 +184,7 @@ router.post('/pay', async (req, res, next) => {
     if (method === "ecocash") {
 
         console.log(_transactionAmount)
-        mobilePay(parseFloat(_transactionAmount), method, payingNumber)
+        mobilePay(parseFloat(_transactionAmount), method, `${payingNumber}`)
             .then(async response => {
 
                 if (response && response.success) {
@@ -303,7 +303,7 @@ router.post('/pay', async (req, res, next) => {
 
     else {
 
-        mobilePay(parseFloat(_transactionAmount), method, payingNumber)
+        mobilePay(parseFloat(_transactionAmount), method, `${payingNumber}`)
             .then(async response => {
 
                 if (response && response.success) {
@@ -312,7 +312,7 @@ router.post('/pay', async (req, res, next) => {
                     } while (my_status === "Sent" || my_status === undefined);
 
 
-                    console.log(response);
+                    // console.log(response);
 
 
                     if (my_status === "Cancelled") {
