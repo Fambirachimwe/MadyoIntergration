@@ -170,7 +170,7 @@ router.post('/pay', (req, res, next) => {
         }
     }
 
-    const customer = await getCustomerPolicy(utilityAccount, mobileNumber, 1);
+    var customer = await getCustomerPolicy(utilityAccount, mobileNumber, 1);
 
     // const _customerData = data.data.customerData.split("|");
     const _monthlyPremium = parseInt(customer.data.amount);
