@@ -23,7 +23,7 @@ router.post('/getCustomer', (req, res, next) => {
 
     console.log(policyType);
 
-    if (policyType === 1) {
+    if (policyType == 1) {
         productName = "NYARADZO";
         merchantName = "NYARADZO"
 
@@ -53,6 +53,7 @@ router.post('/getCustomer', (req, res, next) => {
         }
 
     ).then(data => {
+        console.log(data.data)
         res.send(data.data)
     }).catch(err => {
         res.status(400).json({
