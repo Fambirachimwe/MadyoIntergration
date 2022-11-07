@@ -66,7 +66,7 @@ router.post('/getCustomer', (req, res, next) => {
 
 // make payment
 
-router.post('/pay', async (req, res, next) => {
+router.post('/pay', (req, res, next) => {
 
     // handle payments here using Pesepay or Paynow 
 
@@ -170,7 +170,7 @@ router.post('/pay', async (req, res, next) => {
         }
     }
 
-    const customer = await getCustomerPolicy(utilityAccount, mobileNumber, 1);
+    const customer = getCustomerPolicy(utilityAccount, mobileNumber, 1);
 
     // const _customerData = data.data.customerData.split("|");
     const _monthlyPremium = parseInt(customer.data.amount);
