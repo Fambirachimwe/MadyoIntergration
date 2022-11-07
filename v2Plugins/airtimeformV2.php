@@ -35,9 +35,9 @@ function Form(){
                     <div class="operator_list_container">
 
 
-                        <div class="op_item"><img src="./images/logo-1-ecocash.png" alt="" srcset=""></div>
-                        <div class="op_item"><img src="./images/logo-2-money-1.png" alt="" srcset=""></div>
-                        <div class="op_item">Telecel</div>
+                        <div class="op_item"><img src="https://madyointergration-production.up.railway.app/econet.jpg" alt="" srcset=""></div>
+                        <div class="op_item"><img src="https://madyointergration-production.up.railway.app/netone.jpg" alt="" srcset=""></div>
+                        <div class="op_item"><img src="https://madyointergration-production.up.railway.app/telecel.jpg" alt="" srcset=""></div>
                     </div>
                     <label for="select_oparator">Select Operator</label>
                     <form>
@@ -65,7 +65,7 @@ function Form(){
         <div class="fieldset">
             <div id="step2" class="form_container_2">
                 <h2 class="title">Confirm Your Payment</h2>
-                <h5 class="tagline">Check the details below before making payment</h5>
+                <p class="_tagline">Check the details below before making payment</p>
 
                 <div class="confirmBox">
                     <p>Youre about to topup <span id="confirm_mobileNumber"></span> with ZWL <span
@@ -77,9 +77,9 @@ function Form(){
                     <h2 class="title">Choose Payment Method</h2>
 
                     <button class="method">
-                        <img src="./images/logo-1-ecocash.png" alt="" srcset="">
+                        <img src="https://madyointergration-production.up.railway.app/logo-1-ecocash.png" alt="" srcset="">
                         or
-                        <img src="./images/logo-2-money-1.png" alt="" srcset="">
+                        <img src="https://madyointergration-production.up.railway.app/logo-2-money-1.png" alt="" srcset="">
                     </button>
 
                     <div id="mobileMoneyContainer" class="mobileForm_container">
@@ -237,6 +237,14 @@ function formStyles(){
     echo '
         <style type="text/css">
 
+        @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap");
+
+
+        *{
+            font-family: "Poppins", sans-serif !important;
+        }
+
+
             .airtime_form {
                 position: relative;
                 width: 350px;
@@ -255,6 +263,8 @@ function formStyles(){
                 height: 100%;
                 background-color: rgba(255, 255, 255, 0.952);
                 z-index: 100;
+                left: 50%;
+                transform: translate(-50%);
             
             }
             
@@ -329,11 +339,12 @@ function formStyles(){
                 padding-bottom: 50px;
             }
             
-            .tagline {
+            ._tagline {
                 font-size: 14px;
-                font-weight: lighter;
+                // font-weight: ;
                 margin-top: 5px ;
                 margin-bottom: 20px;
+                font-family: "Poppins", sans-serif;
             }
             
             .confirmBox {

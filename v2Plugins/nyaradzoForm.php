@@ -25,7 +25,7 @@ function nyaradzoForm(){
 
                     <div class="title_container">
                         <h2 class="title">Pay Nyaradzo policy</h2>
-                        <img src="./images/nyaradzo.jpg" alt="" srcset="">
+                        <img src="https://madyointergration-production.up.railway.app/nyaradzo.jpg" alt="" srcset="">
                     </div>
 
                     <form>
@@ -63,6 +63,11 @@ function nyaradzoForm(){
                             <p>Monthly premium</p>
                             <p id="pamount" class="_dt"></p>
                         </div>
+
+                        <div class="_row">
+                            <p>Balance</p>
+                            <p id="pbalance" class="_dt"></p>
+                        </div>
                     </div>
 
 
@@ -83,7 +88,7 @@ function nyaradzoForm(){
                     <div class="zesa_confirmBox">
                         <p>
                             You are about to pay $<span id="c_amount"></span>.00 to Nyaradzo for policy <span
-                                id="c_policyNumber"></span>
+                                id="c_policyNumber"></span>. This amount is Balance remaining + monthly premium
                         </p>
 
                     </div>
@@ -91,16 +96,16 @@ function nyaradzoForm(){
                     <h2 class="title">Choose payment method</h2>
 
                     <button class="zesa_method">
-                        <img src="./images/logo-1-ecocash.png" alt="" srcset="">
+                        <img src="https://madyointergration-production.up.railway.app/logo-1-ecocash.png" alt="" srcset="">
                         or
-                        <img src="./images/logo-2-money-1.png" alt="" srcset="">
+                        <img src="https://madyointergration-production.up.railway.app/logo-2-money-1.png" alt="" srcset="">
                     </button>
 
                     <div id="mobileMoneyContainer" class="mobileForm_container">
                         <p>This will use your Ecocash or OneMoney wallet to pay for this transaction</p>
                         <h3>Mobile Number</h3>
 
-                        <input required type="text" id="nyaradz-payingNumber" placeholder="Enter Mobile Number">
+                        <input required type="text" id="nyaradzo-payingNumber" placeholder="Enter Mobile Number">
                         <button id="npay">Pay</button>
                         <button id="ncancel">Cancel</button>
                     </div>
@@ -118,6 +123,7 @@ function nyaradzoForm(){
 function nyaradzoFormJs(){
     echo '
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
 
     <script>
 
@@ -150,16 +156,22 @@ function nyaradzoFormJs(){
             let mobileNumber;
             let _policyType = 1;
 
+            let payingNumber;
+
             function getPolicyHolder() {
                 var policyUrl = "https://madyointergration-production.up.railway.app/lifeAssurrence/getCustomer";
 
                 var pdata = {
                     mobileNumber,
                     utilityAccount: policyNumber,
-                    policyType: _policyType
+                    policyType: 1
                 }
 
+                console.log(pdata);
+
                 $.post(policyUrl, pdata, function (res) {
+
+                    console.log(res);
                     if (res.responseCode === "00") {
                         $("#pdetails").html(function () {
                             return res.narrative.split(".")[0]
@@ -170,11 +182,15 @@ function nyaradzoFormJs(){
                         });
 
                         $("#pamount").html(function () {
-                            return res.amount * monthsToPay;
+                            return parseFloat(res.amount) ;
+                        });
+
+                        $("#pbalance").html(function () {
+                            return res.customerBalance;
                         });
 
                         $("#c_amount").html(function () {
-                            return res.amount * monthsToPay
+                            return parseFloat(res.amount) * monthsToPay + parseFloat(res.customerBalance)
                         });
 
                         $("#c_policyNumber").html(function () {
@@ -203,9 +219,7 @@ function nyaradzoFormJs(){
                 policyNumber = $("#n-policyNumber").val();
                 monthsToPay = $("#n-months").val();
                 mobileNumber = $("#n-mobileNumber").val();
-
-
-
+                
 
                 // verify the customer details here
                 getPolicyHolder();
@@ -239,12 +253,19 @@ function nyaradzoFormJs(){
 
             $("#npay").click(function () {
                 const nyaradzoUrl = "https://madyointergration-production.up.railway.app/lifeAssurrence/pay";
+                payingNumber = $("#nyaradzo-payingNumber").val();
 
                 var data = {
                     mobileNumber: mobileNumber,
                     utilityAccount: policyNumber,
-                    numberOfMonths: monthsToPay
+                    numberOfMonths: monthsToPay,
+                    policyType: 1,
+                    payingNumber: payingNumber
                 }
+
+                console.log(data)
+
+               
 
 
                 $.post(nyaradzoUrl, data, function (res) {
@@ -253,7 +274,7 @@ function nyaradzoFormJs(){
 
                         Swal.fire({
                             title: "Error!",
-                            text: `Token Purchase Failed`,
+                            text: `Mobile confirmation failed`,
                             icon: "error",
                             confirmButtonText: "OK"
                         });
@@ -311,6 +332,8 @@ function nyaradzoFormStyles (){
         position: absolute;
         width: 100vw;
         height: 100%;
+        left: 50%;
+        transform: translate(-50%);
         background-color: rgba(255, 255, 255, 0.952);
         z-index: 100;
     
@@ -423,6 +446,8 @@ function nyaradzoFormStyles (){
     
     .details_container > ._row > ._dt {
         /* span this class to fill up the container */
+        grid-column: 2 / 4 ;
+        font-family: "Poppins", sans-serif;
         font-weight: bold;
     }
     
