@@ -214,12 +214,15 @@ router.post('/pay', (req, res, next) => {
                                     _transactionAmount = balance ? balance : 0 + (numberOfMonths * monthlyPremium);
 
 
+
+
                                     axios.post(`${url}`,
                                         {
                                             "mti": "0200",
                                             "vendorReference": generatePolicyVendorRefence(),
                                             "processingCode": "U50000",
                                             "vendorNumber": vendorNumbers._liveVendorNumber,
+                                            "amount": _transactionAmount * 100,
                                             "transactionAmount": _transactionAmount * 100,
                                             "sourceMobile": mobileNumber,
                                             "utilityAccount": utilityAccount,
