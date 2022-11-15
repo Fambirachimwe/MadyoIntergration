@@ -15,7 +15,7 @@ router.post(`/getCustomer`, getCustomer);
 //  token purchase
 
 router.post(`/buyToken`, buyToken);
-router.post(`/usd/buyToken`, buyTokenMasterCard);
+router.post(`/buyToken/usd`, buyTokenMasterCard);
 
 
 // Sample JSON Token Resend Request

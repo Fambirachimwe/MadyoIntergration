@@ -628,7 +628,8 @@ export const buyTokenMasterCard = (req, res, next) => {
         if (response && response.success) {
 
             res.json({
-                ...response
+                ...response,
+                responseCode: "00"
             });
 
             do {
@@ -643,7 +644,7 @@ export const buyTokenMasterCard = (req, res, next) => {
                 my_status = "";
                 return res.json({
                     error: 'err01',
-                    message: "Mobile money confirmation failed"
+                    message: "Mastercard payment failed"
                 });
 
             }
