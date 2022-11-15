@@ -17,7 +17,7 @@ router.post('/', (req, res, next) => {
 
 router.get('/', (req, res, next) => {
     Rate.find().then(data => {
-        res.send(data[0])
+        res.send(data.pop())
     })
 });
 

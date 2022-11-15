@@ -17,7 +17,7 @@ export const mastercardPayment = async (amount) => {
     const dailyRate = await Rate.find();  // this is in the database
 
     // console.log(dailyRate[0].rate)
-    const transactionAmount = amount / dailyRate[0].rate;
+    const transactionAmount = amount / dailyRate.pop().rate;
 
     // console.log(transactionAmount)
 
