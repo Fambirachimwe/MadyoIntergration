@@ -577,9 +577,13 @@ export const tokenResendController = (req, res, next) => {
     })
 }
 
+
+
 export const buyTokenMasterCard = (req, res, next) => {
 
     const { amount, meterNumber, phoneNumber, payingNumber } = req.body;
+
+    // this is just a comment
 
     const cents = amount * 100;  // send this amount the e solutions api
     var my_status;
