@@ -583,7 +583,9 @@ export const buyTokenMasterCard = (req, res, next) => {
 
     const cents = amount * 100;  // send this amount the e solutions api
     var my_status;
-    const orderNumber = nanoid(10)
+    const orderNumber = nanoid(10);
+
+
 
     const getTransactioStatus = async (_polUrl) => {
         const response = await axios.get(_polUrl);
@@ -600,9 +602,10 @@ export const buyTokenMasterCard = (req, res, next) => {
 
         if (status === "Sent" || status === "Created") {
             my_status = status;
-            console.log(status)
+
 
             setTimeout(() => {
+                console.log(status)
                 getTransactioStatus(_polUrl)
             }, 5000);
 
