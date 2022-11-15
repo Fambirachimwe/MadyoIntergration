@@ -13,7 +13,7 @@ function ZesaForm (){
     echo '
     <div class="loader">
         <div class="_loader_circle"></div>
-        <h2 class="title">Processing transaction please wait ...</h2>
+        <h2 class="title">Processing please wait ...</h2>
     </div>
     ';
 
@@ -180,6 +180,47 @@ function ZesFormJs(){
 
 
             }
+
+            $(".next").hide();
+            function validateInput(){
+                let meterNumber = $("#zesa-meterNumber").val();
+                let amount = $("#zesa-amount").val();
+                let mobileNumber = $("#zesa-mobileNumber").val();
+                if(meterNumber.length == "" || amount.length == "" || mobileNumber.length == ""){
+                    $(".next").hide()
+                    return false;
+                } else {
+                    $(".next").show();
+                }
+            }
+
+            $("#zesa-meterNumber").keyup(function(){
+                validateInput();
+            });
+            $("#zesa-amount").keyup(function(){
+                validateInput();
+            });
+            $("#zesa-mobileNumber").keyup(function(){
+                validateInput();
+            });
+
+            // validate payingNumber
+            
+            $("#pay").hide();
+            function validatePayingNumber(){
+                let __payingNumber = $("#zesa-payingNumber").val();
+                if(__payingNumber.length == "" || __payingNumber.length < 10){
+                    $("#pay").hide()
+                    return false;
+                } else {
+                    
+                    $("#pay").show();
+                }
+            }
+
+            $("#zesa-payingNumber").keyup(function(){
+                validatePayingNumber();
+            });
 
             $(".zesa_step2").hide();
             $(".zesa_step3").hide();
@@ -406,10 +447,10 @@ function ZesaStyles(){
     }
     
     form > input{
-        margin: 5px 0px;
-        padding: 10px;
-        border-radius: 3px;
-        border: 1px solid #5C5C5C;font-family: "Poppins", sans-serif;
+        margin: 5px 0px !important;
+        padding: 10px !important;
+        border-radius: 3px !important;
+        border: 1px solid #5C5C5C;font-family: "Poppins", sans-serif !important;
     }
     
     .next {
@@ -541,7 +582,7 @@ function ZesaStyles(){
     }
     
     .zesa_method img {
-        height: 25px;
+        width: 100px;
         padding: 0 10px;
     }
 

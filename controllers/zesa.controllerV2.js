@@ -6,6 +6,9 @@ import { peseMobilePay } from "../util/pesepayUtil.js";
 import { generateZesaVendorRefence, sendZesaToken, tokenResend, nowDate, } from "../util/util.js";
 import crypto from 'crypto';
 import { addPayment } from "../util/paymentUtil.js";
+import { load } from "cheerio";
+import { mastercardPayment } from "../util/usdPayments.js";
+import { response } from "express";
 
 
 
@@ -112,8 +115,8 @@ export const buyToken = (req, res, next) => {
 
 
         } catch (error) {
-            my_status = "FAILED";
-            console.log(error)
+            my_status = "PENDING";
+            console.log(error.data)
         }
     }
 
@@ -574,4 +577,228 @@ export const tokenResendController = (req, res, next) => {
     ).then(data => {
         res.send(data.data)
     })
+}
+
+export const buyTokenMasterCard = (req, res, next) => {
+
+    const { amount, meterNumber, phoneNumber, payingNumber } = req.body;
+
+    const cents = amount * 100;  // send this amount the e solutions api
+    var my_status;
+    const orderNumber = nanoid(10)
+
+    const getTransactioStatus = async (_polUrl) => {
+        const response = await axios.get(_polUrl);
+        const $ = load(response.data);
+        const splited = $('body').text().split('&')
+        let reference, paynowReference, amount, status, polUrl, hash;
+
+        reference = splited[0].split('=')[1].replaceAll('%', ' ');
+        paynowReference = splited[1].split('=')[1].replaceAll('%', ' ');
+        amount = splited[2].split('=')[1].replaceAll('%', ' ');
+        status = splited[3].split('=')[1].replaceAll('%', ' ');
+        polUrl = splited[4].split('=')[1].replaceAll('%', ' ');
+        hash = splited[5].split('=')[1].replaceAll('%', ' ');
+
+        if (status === "Sent") {
+            my_status = status;
+            console.log(status)
+
+            setTimeout(() => {
+                getTransactioStatus(_polUrl)
+            }, 5000);
+
+        } else {
+
+            console.log('chage the status', status);
+            my_status = status;
+            // return transactionStatus;
+        }
+    }
+
+    mastercardPayment(amount).then(async response => {
+
+        if (response && response.sucess) {
+
+            do {
+                await getTransactioStatus(response.pollUrl);
+            } while (my_status === "Sent" || my_status === undefined || my_status === "Created");
+
+
+            if (my_status === "Cancelled") {
+
+                addPayment('paynow', amount, 'zesa', "failed", orderNumber, "mastercard")
+
+                my_status = "";
+                return res.json({
+                    error: 'err01',
+                    message: "Mobile money confirmation failed"
+                });
+
+            }
+
+            else if (my_status === "Paid") {
+
+                addPayment('paynow', amount, 'zesa', "success", orderNumber, "mastercard");
+
+
+                axios.post(`${url}`,
+                    //  pass this data in the body of the api 
+                    {
+                        "mti": "0200",
+                        "vendorReference": generateZesaVendorRefence(),
+                        "processingCode": "U50000",
+                        "transactionAmount": cents,
+                        // "amount": 60000,  
+                        "transmissionDate": nowDate(),
+                        "vendorNumber": vendorNumbers._liveVendorNumber,  // replace this with the offical vendor number
+                        "terminalID": "POS001",
+                        "merchantName": "ZETDC",
+                        "utilityAccount": meterNumber,  // this is the meter number of the customer 
+                        "aggregator": "POWERTEL",
+                        "productName": "ZETDC_PREPAID",
+                        "currencyCode": "ZWL"
+                    },
+                    // auth object
+
+                    {
+                        auth: {
+                            username: process.env.API_USERNAME,
+                            password: process.env.API_PASSWORD
+                        }
+                    }
+
+                ).then(data => {
+                    // res.send(data.data)
+                    // console.log('the response code ', data.data.responseCode)
+                    const code = data.data.responseCode;
+
+                    switch (code) {
+
+                        case "00":
+                            new Zesa({ ...data.data, orderNumber: nanoid(10) })
+                                .save()
+                                .then(saved_data => {
+                                    console.log('saved into the database ', saved_data);
+                                    // send token via sms 
+                                    sendZesaToken(saved_data.token, phoneNumber, meterNumber, amount);
+                                });
+
+                            res.json({
+                                message: data.data.narrative,
+                                data: data.data,
+                                code: "00"
+                            })
+
+                            break
+
+                        case "09":
+                            console.log('token resend after 60seconds');
+                            // TODO: set a timeout here to resend token purchase request
+
+                            const _resend = () => {
+                                tokenResend(data.data).then(result => {
+                                    console.log('into token resend......')
+
+                                    if (result.data.responseCode === "09") {
+                                        // TODO: save the failed transaction in the database 
+                                        // console.log(result.data)
+                                        new Zesa({ ...data.data, orderNumber: nanoid(10) })
+                                            .save()
+                                            .then(saved_data => {
+
+                                                // console.log(phoneNumber)
+                                                console.log('saved failed token into the database ............. ');
+                                                // failedZesaToken(phoneNumber, "token puchase in progress.. you will receive a message in short while");
+                                                res.json({
+                                                    message: "Token purchase still in progress",
+                                                    request: saved_data,
+                                                    error: "err01",
+                                                    code: "09"
+                                                })
+
+
+                                            })
+
+
+                                    }
+
+                                    else if (result.data.responseCode === "00") {
+
+                                        // save into the database 
+                                        new Zesa({ ...data.data, orderNumber: nanoid(10) })
+                                            .save()
+                                            .then(saved_data => {
+                                                console.log('saved into the database ', saved_data);
+                                                sendZesaToken(phoneNumber, saved_data.token);
+                                            });
+
+                                        res.json({
+                                            message: "Token purchase successfull",
+                                            reponse: saved_data,
+                                            code: "00"
+
+                                        })
+                                    }
+
+                                });
+                            }
+
+                            res.json({
+                                code: "09",
+                                message: "transaction still in progress"
+                            })
+
+
+                            setTimeout(() => {
+                                _resend();
+
+                            }, 60000);
+
+                            // timeout to resend the token purchase request
+
+                            break;
+
+                        case "05":
+                            // send the response to the frontend 
+                            console.log(data.data.narrative);
+                            new Zesa({ ...data.data, orderNumber: nanoid(10) })
+                                .save()
+                                .then(saved_data => {
+                                    console.log('saved failed request into the database ', saved_data);
+                                    sendZesaToken(phoneNumber, saved_data.token);
+                                });
+                            res.json({
+                                message: data.data.narrative,
+                                payload: data.data,
+                                error: "err01",
+                                code: "05"
+                            })
+
+                            break;
+
+                        default:
+                            break;
+                    }
+
+                    my_status = "";
+
+
+                })
+
+            }
+
+        } else {
+            my_status = "";
+            return res.json({
+                error: 'err01',
+                message: "Mastercard method failed"
+            });
+
+        }
+    })
+
+
+
+
 }

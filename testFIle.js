@@ -1,3 +1,10 @@
+import 'dotenv/config';
+import { Paynow } from 'paynow';
+import { nanoid } from 'nanoid';
+
+let paynow = new Paynow(process.env.madyoLiveUSDId, process.env.madyoLiveUSDKey);
+
+
 const str = "34397317664422574275|4.8||RCT1666967869069|47170|0|0";
 
 
@@ -308,4 +315,55 @@ const adsl_fibre = [...home, ...infinity, ...Intense]
 
 
 const total = [...home, ...infinity, ...Intense, ...Voice, ...blaze]
-console.log(Voice.length)
+// console.log(Voice.length)
+
+
+// checking card types
+const creditCardType = (cc) => {
+    let visa = new RegExp('^4[0-9]{12}(?:[0-9]{3})?$');
+    let mastercard = new RegExp('^5[1-5][0-9]{14}$');
+    let mastercard2 = new RegExp('^2[2-7][0-9]{14}$');
+
+    if (visa.test(cc)) {
+        return 'VISA';
+    }
+
+    if (mastercard.test(cc) || mastercard2.test(cc)) {
+        return 'MASTERCARD';
+    }
+
+    return undefined;
+}
+
+// console.log(creditCardType(4531930000899037))
+
+const mastercardPayment = (amount) => {
+
+    const dailyRate = 603;
+    const transactionAmount = amount * dailyRate;
+
+    const invoiceNumber = nanoid(5);
+    paynow.resultUrl = "http://localhost:5500/result.html";
+    paynow.returnUrl = "http://example.com/return?gateway=paynow&merchantReference=1234";
+
+    let payment = paynow.createPayment(invoiceNumber, process.env.AUTH_EMAIL);
+    // Passing in the name of the item and the price of the item
+    payment.add("Bill payment", transactionAmount);
+
+    // payment.add('bill-payment', amount);
+
+    return paynow.send(payment);
+
+}
+
+mastercardPayment().then(response => {
+    // Check if request was successful
+    console.log(response)
+    if (response && response.success) {
+        // Get the link to redirect the user to, then use it as you see fit
+        let link = response.redirectUrl;
+        console.log(link);
+    } else {
+        console.log("Mastercard payment failed")
+    }
+});

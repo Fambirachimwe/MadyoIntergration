@@ -12,7 +12,7 @@ function nyaradzoForm(){
     echo '
     <div class="loader">
         <div class="_loader_circle"></div>
-        <h2 class="title">Processing transaction please wait ...</h2>
+        <h2 class="title">Processing please wait ...</h2>
     </div>
     ';
 
@@ -87,7 +87,7 @@ function nyaradzoForm(){
 
                     <div class="zesa_confirmBox">
                         <p>
-                            You are about to pay $<span id="c_amount"></span>.00 to Nyaradzo for policy <span
+                            You are about to pay $<span id="c_amount"></span> to Nyaradzo for policy number <span
                                 id="c_policyNumber"></span>. This amount is Balance remaining + monthly premium
                         </p>
 
@@ -198,6 +198,8 @@ function nyaradzoFormJs(){
                         })
 
                     } else {
+
+                        $(".next").hide();
                         Swal.fire({
                             title: "Error!",
                             text: `Detail Verification Failed`,
@@ -208,6 +210,50 @@ function nyaradzoFormJs(){
                     }
                 })
             }
+
+            // validate input here 
+            $(".next").hide();
+
+            function validateInput(){
+                let _policyNumber = $("#n-policyNumber").val();
+                let _monthsToPay = $("#n-months").val();
+                let _mobileNumber = $("#n-mobileNumber").val();
+                
+                if(_policyNumber.length == "" || _monthsToPay.length == "" || _mobileNumber.length == ""){
+                    $(".next").hide()
+                    return false;
+                } else {
+                    $(".next").show();
+                }
+            }
+
+            $("#n-policyNumber").keyup(function(){
+                validateInput();
+            });
+            $("#n-months").keyup(function(){
+                validateInput();
+            });
+            $("#n-mobileNumber").keyup(function(){
+                validateInput();
+            });
+
+            // validate payingNumber
+            
+            $("#npay").hide();
+            function validatePayingNumber(){
+                let __payingNumber = $("#nyaradzo-payingNumber").val();
+                if(__payingNumber.length == "" || __payingNumber.length < 10){
+                    $("#npay").hide()
+                    return false;
+                } else {
+                    
+                    $("#npay").show();
+                }
+            }
+
+            $("#nyaradzo-payingNumber").keyup(function(){
+                validatePayingNumber();
+            });
 
 
             $("#next_1").click(function () {
@@ -514,7 +560,7 @@ function nyaradzoFormStyles (){
     }
     
     .zesa_method img {
-        height: 25px;
+        width: 100px;
         padding: 0 10px;
     }
     

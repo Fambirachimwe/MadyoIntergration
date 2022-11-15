@@ -115,7 +115,7 @@ export const nowDate = () => {
     return formatedDate
 }
 
-//  send SMS
+//  send SMS  using the Twilio API 
 
 export const sendSMS = async (to, data) => {
 
@@ -313,7 +313,7 @@ export const airtimeResend = (data) => {
 
 
 
-
+// Paynow mobile payment method
 export const mobilePay = (amount, method, customerPhoneNumber) => {
 
     const invoiceNumber = nanoid(5);
@@ -342,13 +342,6 @@ export const mobilePay = (amount, method, customerPhoneNumber) => {
 
 
 }
-
-// TODO: save the payment  to the database  
-
-export const savePaymentToDatabase = (data) => {
-    // save the data in the database 
-}
-
 
 // SMS Gate
 

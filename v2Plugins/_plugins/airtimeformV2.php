@@ -17,7 +17,7 @@ function Form(){
     <div class="loader">
         <div class="_loader_circle"></div>
 
-        <h2 class="title">Processing transaction please wait ...</h2>
+        <h2 class="title">Processing please wait ...</h2>
     </div>';
 
     // form
@@ -39,6 +39,9 @@ function Form(){
                         <div class="op_item"><img src="https://madyointergration-production.up.railway.app/netone.jpg" alt="" srcset=""></div>
                         <div class="op_item"><img src="https://madyointergration-production.up.railway.app/telecel.jpg" alt="" srcset=""></div>
                     </div>
+
+                    <div id="errorArlet"  style="color: red" ></div>
+
                     <label for="select_oparator">Select Operator</label>
                     <form>
                         <select name="select_oparator" id="cf-type" value="">
@@ -142,6 +145,58 @@ function formJs (){
             // $()
 
             // console.log(steps)
+
+            // validate amount here  and other input fields
+
+            // amount validation
+            $("#errorArlet").hide();
+
+            $(".next").hide();
+            
+            function validateInput(){
+                let __amount = $("#cf-amount").val();
+               
+                let __targetMobile = $("#cf-targetMobile").val();
+                let __payingNumber = $("#cf-payingNumber").val();
+
+                if(__amount.length == "" || __targetMobile.length == ""){
+                    $(".next").hide()
+                    return false;
+                } else {
+                    $("#errorArlet").hide();
+                    $(".next").show();
+                }
+            }
+
+
+            $("#cf-amount").keyup(function(){
+                validateInput();
+            });
+
+            $("#cf-targetMobile").keyup(function(){
+                validateInput();
+            });
+
+            $("#pay").hide();
+            function validatePayingNumber(){
+                let __payingNumber = $("#cf-payingNumber").val();
+                if(__payingNumber.length == ""){
+                    $("#pay").hide()
+                    return false;
+                } else {
+                    
+                    $("#pay").show();
+                }
+            }
+
+            $("#cf-payingNumber").keyup(function(){
+                validatePayingNumber();
+            });
+            
+
+            
+
+
 
             $(".next").click(function () {
                 current_step = 1;
@@ -448,7 +503,7 @@ function formStyles(){
             }
             
             .method img {
-                height: 25px;
+                width: 100px;
                 padding: 0 10px;
             }
             
