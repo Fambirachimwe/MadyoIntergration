@@ -3,12 +3,12 @@ import { nanoid } from "nanoid";
 import Zesa from "../models/zesa.js";
 import { vendorNumbers } from "../util/constants.js";
 import { peseMobilePay } from "../util/pesepayUtil.js";
-import { generateZesaVendorRefence, sendZesaToken, tokenResend, nowDate, } from "../util/util.js";
+import { generateZesaVendorRefence, sendZesaToken, tokenResend, nowDate, mobilePay, } from "../util/util.js";
 import crypto from 'crypto';
 import { addPayment } from "../util/paymentUtil.js";
 import { load } from "cheerio";
 import { mastercardPayment } from "../util/usdPayments.js";
-import { response } from "express";
+
 
 
 
@@ -123,6 +123,7 @@ export const buyToken = (req, res, next) => {
     // checking the transaction status for paynow
 
     const getTransactioStatus = async (_polUrl) => {
+
         const response = await axios.get(_polUrl);
         const $ = load(response.data);
         const splited = $('body').text().split('&')
@@ -164,7 +165,7 @@ export const buyToken = (req, res, next) => {
     } else {
 
 
-        if (method === "ecocash") {
+        if (method === "ecocash" && amount < 50000) {
 
             peseMobilePay(amount, "ZWL", "PZW201", payingNumber)
 

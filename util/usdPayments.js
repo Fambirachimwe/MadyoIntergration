@@ -1,6 +1,6 @@
 
 import 'dotenv/config';
-import { creditCardType } from "./cardValidation";
+// import { creditCardType } from "./cardValidation";
 import { Paynow } from 'paynow';
 import { nanoid } from 'nanoid';
 
