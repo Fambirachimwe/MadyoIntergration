@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import express from 'express';
-import { tokenResendController } from '../controllers/zesa.controllerV2.js'
+import { buyTokenMasterCard, tokenResendController } from '../controllers/zesa.controllerV2.js'
 import { buyToken, getCustomer } from '../controllers/zesa.controllerV2.js';
 
 
@@ -15,6 +15,7 @@ router.post(`/getCustomer`, getCustomer);
 //  token purchase
 
 router.post(`/buyToken`, buyToken);
+router.post(`/usd/buyToken`, buyTokenMasterCard);
 
 
 // Sample JSON Token Resend Request

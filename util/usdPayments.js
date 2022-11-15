@@ -3,6 +3,7 @@ import 'dotenv/config';
 // import { creditCardType } from "./cardValidation";
 import { Paynow } from 'paynow';
 import { nanoid } from 'nanoid';
+import Rate from '../models/dailyRate.js';
 
 let paynow = new Paynow(process.env.madyoLiveUSDId, process.env.madyoLiveUSDKey);
 
@@ -11,10 +12,14 @@ let paynow = new Paynow(process.env.madyoLiveUSDId, process.env.madyoLiveUSDKey)
 
 //  send the transaction to be procced by either paynow or pesepay
 
-export const mastercardPayment = (amount) => {
+export const mastercardPayment = async (amount) => {
 
-    const dailyRate = 603;  // this is in the database
-    const transactionAmount = amount * dailyRate;
+    const dailyRate = await Rate.find();  // this is in the database
+
+    // console.log(dailyRate[0].rate)
+    const transactionAmount = amount / dailyRate[0].rate;
+
+    // console.log(transactionAmount)
 
     const invoiceNumber = nanoid(5);
     paynow.resultUrl = "http://localhost:5500/result.html";

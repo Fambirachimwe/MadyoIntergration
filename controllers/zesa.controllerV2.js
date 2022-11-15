@@ -554,9 +554,6 @@ export const buyToken = (req, res, next) => {
             })
         }
 
-
-
-
     }
 
 }
@@ -601,7 +598,7 @@ export const buyTokenMasterCard = (req, res, next) => {
         polUrl = splited[4].split('=')[1].replaceAll('%', ' ');
         hash = splited[5].split('=')[1].replaceAll('%', ' ');
 
-        if (status === "Sent") {
+        if (status === "Sent" || status === "Created") {
             my_status = status;
             console.log(status)
 
@@ -609,7 +606,8 @@ export const buyTokenMasterCard = (req, res, next) => {
                 getTransactioStatus(_polUrl)
             }, 5000);
 
-        } else {
+        }
+        else {
 
             console.log('chage the status', status);
             my_status = status;
@@ -619,7 +617,12 @@ export const buyTokenMasterCard = (req, res, next) => {
 
     mastercardPayment(amount).then(async response => {
 
-        if (response && response.sucess) {
+        console.log(response);
+        if (response && response.success) {
+
+            res.json({
+                ...response
+            });
 
             do {
                 await getTransactioStatus(response.pollUrl);

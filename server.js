@@ -10,6 +10,8 @@ import mongoose from "mongoose";
 import path from 'path';
 import lifeAssuranceRoutes from './routes/lifeAssurance.js';
 import telOneRoutes from './routes/telone.js'
+import rateRoutes from './routes/rate.js'
+
 
 // connection to mongoDB
 //'mongodb://localhost/Madyozw'
@@ -54,6 +56,7 @@ app.use('/lifeAssurrence', lifeAssuranceRoutes);
 app.use('/v2/zesa', zesaV2Routes);
 app.use('/v2/airtime', airTimeRoutesV2);
 app.use('/v2/telone', telOneRoutes)
+app.use('/rate', rateRoutes)
 
 // error Handling
 
