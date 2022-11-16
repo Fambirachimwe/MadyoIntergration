@@ -616,7 +616,7 @@ export const buyTokenMasterCard = (req, res, next) => {
 
 
                 setTimeout(() => {
-                    console.log(status)
+                    // console.log(status)
                     getTransactioStatus(_polUrl)
                 }, 5000);
 
@@ -629,7 +629,7 @@ export const buyTokenMasterCard = (req, res, next) => {
             }
         } catch (error) {
             console.log(error.message);
-            my_status = "Canceled";
+            my_status = "Cancelled";
             return
         }
 
