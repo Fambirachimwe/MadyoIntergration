@@ -10,7 +10,7 @@ paynow.resultUrl = "http://localhost:5500/result.html";
 paynow.returnUrl = "http://example.com/return?gateway=paynow&merchantReference=1234";
 
 
-console.log(paynow)
+
 
 
 // check card type

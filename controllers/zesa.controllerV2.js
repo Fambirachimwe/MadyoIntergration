@@ -551,6 +551,10 @@ export const buyToken = (req, res, next) => {
                     my_status = "";
                 }
 
+            }).catch(err => {
+                my_status = "Canceled",
+                    res.send(err)
+
             })
         }
 
@@ -592,34 +596,45 @@ export const buyTokenMasterCard = (req, res, next) => {
 
 
     const getTransactioStatus = async (_polUrl) => {
-        const response = await axios.get(_polUrl);
-        const $ = load(response.data);
-        const splited = $('body').text().split('&')
-        let reference, paynowReference, amount, status, polUrl, hash;
-
-        reference = splited[0].split('=')[1].replaceAll('%', ' ');
-        paynowReference = splited[1].split('=')[1].replaceAll('%', ' ');
-        amount = splited[2].split('=')[1].replaceAll('%', ' ');
-        status = splited[3].split('=')[1].replaceAll('%', ' ');
-        polUrl = splited[4].split('=')[1].replaceAll('%', ' ');
-        hash = splited[5].split('=')[1].replaceAll('%', ' ');
-
-        if (status === "Sent" || status === "Created") {
-            my_status = status;
 
 
-            setTimeout(() => {
-                console.log(status)
-                getTransactioStatus(_polUrl)
-            }, 5000);
+        try {
+            const response = await axios.get(_polUrl);
+            const $ = load(response.data);
+            const splited = $('body').text().split('&')
+            let reference, paynowReference, amount, status, polUrl, hash;
 
+            reference = splited[0].split('=')[1].replaceAll('%', ' ');
+            paynowReference = splited[1].split('=')[1].replaceAll('%', ' ');
+            amount = splited[2].split('=')[1].replaceAll('%', ' ');
+            status = splited[3].split('=')[1].replaceAll('%', ' ');
+            polUrl = splited[4].split('=')[1].replaceAll('%', ' ');
+            hash = splited[5].split('=')[1].replaceAll('%', ' ');
+
+            if (status === "Sent" || status === "Created") {
+                my_status = status;
+
+
+                setTimeout(() => {
+                    console.log(status)
+                    getTransactioStatus(_polUrl)
+                }, 5000);
+
+            }
+            else {
+
+                console.log('chage the status', status);
+                my_status = status;
+                // return transactionStatus;
+            }
+        } catch (error) {
+            console.log(error.message);
+            my_status = "Canceled";
+            return
         }
-        else {
 
-            console.log('chage the status', status);
-            my_status = status;
-            // return transactionStatus;
-        }
+
+
     }
 
     mastercardPayment(amount).then(async response => {
