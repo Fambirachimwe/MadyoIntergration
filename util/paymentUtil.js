@@ -4,6 +4,8 @@ import Payment from "../models/payments.js"
 
 export const addPayment = (gateway, amount, reason, paymentStatus, transactionOrderNumber, mobilePlatform, phoneNumber) => {
 
+    console.log(phoneNumber);
+
     new Payment({
         gateway: gateway,
         amount: amount,
