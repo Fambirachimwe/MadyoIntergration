@@ -58,6 +58,14 @@ export const buyToken = (req, res, next) => {
 
     const { amount, meterNumber, phoneNumber, payingNumber } = req.body;  // the phone number is the paying phoneNumber on the frontend t
     // 41234567890  demo meterNumber
+
+
+    const suppliedData = {
+        amount, meterNumber, phoneNumber, payingNumber
+    };
+
+    console.log(suppliedData);
+
     const cents = amount * 100;
     const netone = /^071/;   // regex for econet phone number
     const econet = /^077|^078/;
@@ -182,7 +190,7 @@ export const buyToken = (req, res, next) => {
                         }
                         if (my_status === "FAILED") {
                             // console.log(my_status)
-                            addPayment('pese', amount, 'zesa', "failed", orderNumber, method)
+                            addPayment('pese', amount, 'zesa', "failed", orderNumber, method, phoneNumber)
                             my_status = "";
                             return res.json({
                                 error: 'err01',
