@@ -173,6 +173,7 @@ export const sendZesaToken = (token, number, meterNumber, amount) => {
     // example of the token data from the response 
 
     // 34397317664422574275|4.8||RCT1666967869069|47170|0|0
+    console.log('sending zesa token to this number', number);
 
     const sms = `token: ${messageObject.token}
     meter: ${meterNumber}

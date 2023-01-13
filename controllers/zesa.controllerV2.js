@@ -230,7 +230,7 @@ export const buyToken = (req, res, next) => {
                                 switch (code) {
 
                                     case "00":
-                                        new Zesa({ ...data.data, orderNumber: nanoid(10) })
+                                        new Zesa({ ...data.data, orderNumber: orderNumber })
                                             .save()
                                             .then(saved_data => {
                                                 console.log('saved into the database ', saved_data);
