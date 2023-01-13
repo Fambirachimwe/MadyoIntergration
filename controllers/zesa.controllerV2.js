@@ -194,7 +194,7 @@ export const buyToken = (req, res, next) => {
                         else if (my_status === "SUCCESS") {
 
                             console.log("ecocash transaction completed");
-                            addPayment('pese', amount, 'zesa', "success", orderNumber, method)
+                            addPayment('pese', amount, 'zesa', "success", orderNumber, method, payingNumber)
 
                             axios.post(`${url}`,
                                 //  pass this data in the body of the api 

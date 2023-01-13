@@ -30,6 +30,8 @@ export const netoneAirtimeControllerV2 = (req, res, next) => {
 
     var my_status;
 
+    // global orderNUmber
+
     if (econet.test(payingNumber)) { method = 'ecocash' }
     if (netone.test(payingNumber)) { method = 'onemoney' }
 
@@ -126,7 +128,7 @@ export const netoneAirtimeControllerV2 = (req, res, next) => {
 
                     if (my_status === "FAILED") {
                         // save the payment to the database
-                        addPayment('pese', amount, 'netone airtime', "failed", orderNumber, method)
+                        addPayment('pese', amount, 'netone airtime', "failed", orderNumber, method, payingNumber)
 
                         console.log(my_status);
 

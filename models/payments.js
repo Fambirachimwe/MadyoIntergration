@@ -10,7 +10,8 @@ const paymentSchema = new Schema({
     date: { type: Date, default: Date.now() },
 
     transactionOrderNumber: String, // this is from the orderNumber provided when initiating a transaction
-    mobilePlatform: String // ecocash, onemoney, visa, etc
+    mobilePlatform: String, // ecocash, onemoney, visa, etc
+    phoneNumber: String
 
 });
 

@@ -2,7 +2,7 @@
 
 import Payment from "../models/payments.js"
 
-export const addPayment = (gateway, amount, reason, paymentStatus, transactionOrderNumber, mobilePlatform) => {
+export const addPayment = (gateway, amount, reason, paymentStatus, transactionOrderNumber, mobilePlatform, phoneNumber) => {
 
     new Payment({
         gateway: gateway,
@@ -10,7 +10,8 @@ export const addPayment = (gateway, amount, reason, paymentStatus, transactionOr
         reason: reason,
         paymentStatus: paymentStatus,
         transactionOrderNumber: transactionOrderNumber,
-        mobilePlatform: mobilePlatform
+        mobilePlatform: mobilePlatform,
+        phoneNumber: phoneNumber
     }).save()
         .then(() => {
             console.log("Payment saved to database")

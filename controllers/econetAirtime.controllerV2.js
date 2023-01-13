@@ -139,7 +139,7 @@ export const econetAirtimeControllerV2 = async (req, res, next) => {
                     else if (my_status === "SUCCESS") {
                         console.log("ecocash transaction completed");
                         // save the payment  in the database here 
-                        addPayment('pese', amount, 'econet airtime', "success", orderNumber, method);
+                        addPayment('pese', amount, 'econet airtime', "success", orderNumber, method, payingNumber);
 
 
                         axios.post(`${url}`,
