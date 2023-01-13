@@ -56,12 +56,12 @@ export const getCustomer = (req, res, next) => {
 
 export const buyToken = (req, res, next) => {
 
-    const { amount, meterNumber, phoneNumber, payingNumber } = req.body;  // the phone number is the paying phoneNumber on the frontend t
+    const { amount, meterNumber, targetMobile, payingNumber } = req.body;  // the phone number is the paying phoneNumber on the frontend t
     // 41234567890  demo meterNumber
 
 
     const suppliedData = {
-        amount, meterNumber, phoneNumber, payingNumber
+        amount, meterNumber, targetMobile, payingNumber
     };
 
     console.log(suppliedData);
@@ -190,7 +190,7 @@ export const buyToken = (req, res, next) => {
                         }
                         if (my_status === "FAILED") {
                             // console.log(my_status)
-                            addPayment('pese', amount, 'zesa', "failed", orderNumber, method, phoneNumber)
+                            addPayment('pese', amount, 'zesa', "failed", orderNumber, method, targetMobile)
                             my_status = "";
                             return res.json({
                                 error: 'err01',
@@ -202,7 +202,7 @@ export const buyToken = (req, res, next) => {
                         else if (my_status === "SUCCESS") {
 
                             console.log("ecocash transaction completed");
-                            addPayment('pese', amount, 'zesa', "success", orderNumber, method, payingNumber)
+                            addPayment('pese', amount, 'zesa', "success", orderNumber, method, targetMobile)
 
                             axios.post(`${url}`,
                                 //  pass this data in the body of the api 
@@ -244,7 +244,7 @@ export const buyToken = (req, res, next) => {
                                                 console.log('saved into the database ', saved_data);
 
 
-                                                sendZesaToken(saved_data.token, phoneNumber, meterNumber, amount)
+                                                sendZesaToken(saved_data.token, targetMobile, meterNumber, amount)
                                             });
 
                                         res.json({
