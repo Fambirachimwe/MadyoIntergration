@@ -12,6 +12,7 @@ import lifeAssuranceRoutes from './routes/lifeAssurance.js';
 import telOneRoutes from './routes/telone.js'
 import rateRoutes from './routes/rate.js'
 import { buyTokenMasterCard } from './controllers/zesa.controllerV2.js';
+import { buyTokenCash } from './controllers/buyTokenCash.js';
 
 
 // connection to mongoDB
@@ -48,6 +49,12 @@ app.get('/', (req, res, next) => {
 // routes for the v1 
 app.use('/vendor', vendorRoutes);
 app.use('/zesa', zesaRoutes);
+
+
+// buy token cash
+// app.use('/buyTokenCash', buyTokenCash);
+
+
 app.use('/airtime', airTimeRoutes);
 app.use('/lifeAssurrence', lifeAssuranceRoutes);
 
