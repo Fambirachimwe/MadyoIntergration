@@ -634,7 +634,7 @@
 
                 $.post(url, data, function (res) {
                     // $(".loader").css("display", "none");
-                    // console.log(res);
+                    // console.log(res.data);
                     if (res.error === "err01") {
                         const message = res.message;
 
@@ -647,7 +647,7 @@
                             confirmButtonText: "OK"
                         });
                     }
-                    else if (res.responseCode === "00") {
+                    else if (res.data.responseCode === "00") {
 
                         // alert("Transaction processed successfully");
                         Swal.fire({
@@ -658,7 +658,7 @@
                         });
                     }
 
-                    else if (res.responseCode === "09") {
+                    else if (res.data.responseCode === "09") {
                         // alert("Transaction in progress")
                         Swal.fire({
                             title: "Success!",
