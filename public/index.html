@@ -6,6 +6,10 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+    <!-- <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script> -->
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <style type="text/css">
         @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap");
 
@@ -15,9 +19,12 @@
         }
 
         .zesa_form {
-            position: relative;
+            position: absolute;
             width: 350px;
-            margin: auto auto;
+            top: 20%;
+            left: 50%;
+            transform: translateX( -50%);
+            /* margin: auto auto; */
             padding: 30px;
             border-radius: 10px;
             box-shadow: 0px 4px 13px 2px rgba(0, 0, 0, 0.25);
@@ -347,7 +354,7 @@
             <div class="fieldset">
                 <div class="zesa_step2">
                     <h2 class="title">Verify Details</h2>
-                    <p>Check the details below befor making payment</p>
+                    <p>Check the details below before making payment</p>
 
                     <div class="details_container">
                         <div class="_row">
@@ -405,9 +412,7 @@
 
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
-    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
     <script>
 
         $(document).ajaxStart(function () {
@@ -562,10 +567,10 @@
                         // $(".loader").css("display", "none");
                         // console.log(res);
 
-                        if (res.success) {
-                            // redirect here to the redirect url
-                            window.location.href = res.redirectUrl;
-                        }
+                        // if (res.success) {
+                        //     // redirect here to the redirect url
+                        //     window.location.href = res.redirectUrl;
+                        // }
 
                         if (res.error === "err01") {
                             const message = res.message;
@@ -578,6 +583,8 @@
                             });
                         }
                         else if (res.responseCode === "00") {
+
+                            // alert()
                             Swal.fire({
                                 title: "Processing",
                                 text: "Transaction in progress please wait for redirection ....",
@@ -628,9 +635,10 @@
                 $.post(url, data, function (res) {
                     // $(".loader").css("display", "none");
                     // console.log(res);
-
                     if (res.error === "err01") {
                         const message = res.message;
+
+                        // alert("Token Purchase Failed")
 
                         Swal.fire({
                             title: "Error!",
@@ -640,6 +648,8 @@
                         });
                     }
                     else if (res.responseCode === "00") {
+
+                        alert("Transaction processed successfully");
                         Swal.fire({
                             title: "Success!",
                             text: "Transaction processed successfully ",
@@ -649,6 +659,7 @@
                     }
 
                     else if (res.responseCode === "09") {
+                        // alert("Transaction in progress")
                         Swal.fire({
                             title: "Success!",
                             text: "Transaction in progress",
