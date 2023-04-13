@@ -9,8 +9,10 @@ const url = process.env.BASE_URL;
 
 export const buyTokenCash = (req, res, next) => {
 
-    const { amount, meterNumber, targetMobile, payingNumber } = req.body;  // the phone number is the paying phoneNumber on the frontend t
+    const { amount, meterNumber, targetMobile, payingNumber, currencyCode } = req.body;  // the phone number is the paying phoneNumber on the frontend t
     // 41234567890  demo meterNumber
+
+    // currency code is either ZWD OR USD
 
 
     const suppliedData = {
@@ -38,7 +40,8 @@ export const buyTokenCash = (req, res, next) => {
             "utilityAccount": meterNumber,  // this is the meter number of the customer 
             "aggregator": "POWERTEL",
             "productName": "ZETDC_PREPAID",
-            "currencyCode": "ZWL"
+            "currencyCode": currencyCode,
+            "apiVersion": "02"
         },
         // auth object
 

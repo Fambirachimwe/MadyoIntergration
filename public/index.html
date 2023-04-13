@@ -342,7 +342,18 @@
 
                         <input required type="text" id="zesa-mobileNumber" placeholder="Mobile Number">
 
+                        <select name="currencyCode" id="currencyCode">
+                            <option value="ZWL">ZWL</option>
+                            <option value="USD">USD</option>
+                        </select>
+
                         <input required id="next_1" class="next" type="button" value="Next">
+
+                        <!-- select field input -->
+
+                        
+
+
                     </form>
 
 
@@ -431,6 +442,8 @@
             let amount;
             let payingNumber;
 
+            let currencyCode;
+
             function getCustomer() {
                 var getCustomerUrl = "https://madyointergration-production.up.railway.app/zesa/getCustomer";
 
@@ -439,7 +452,7 @@
                 };
 
                 $.post(getCustomerUrl, _data, function (res) {
-                    // console.log(res);
+                    console.log(res);
 
                     if (res.responseCode === "00") {
 
@@ -626,10 +639,13 @@
                 var url = "https://madyointergration-production.up.railway.app/v2/zesa/cash";
 
                 payingNumber = $("#zesa-payingNumber").val();
+
+                currencyCode = $('#currencyCode').find(":selected").val();
                 var data = {
                     amount, targetMobile: mobileNumber,
                     payingNumber,
-                    meterNumber
+                    meterNumber, 
+                    currencyCode
                 }
 
                 $.post(url, data, function (res) {
@@ -682,7 +698,7 @@
                 };
 
                 $.post(getCustomerUrl, _data, function (res) {
-                    // console.log(res);
+                    console.log(res);
 
                     if (res.responseCode === "00") {
 
