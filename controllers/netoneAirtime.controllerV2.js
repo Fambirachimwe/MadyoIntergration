@@ -244,7 +244,7 @@ export const netoneAirtimeControllerV2 = (req, res, next) => {
 
                                             // sendSMS(`${targetMobile}`, data.data)
                                             // using the Madyo sms gateway
-                                            smsGateway(`Airtime Credited with $${transactionAmount / 100}`, targetMobile);
+                                            smsGateway(`Airtime Credited with $${parseInt(transactionAmount) / 100}.00`, targetMobile);
                                         })
 
                                     res.send(data.data)
