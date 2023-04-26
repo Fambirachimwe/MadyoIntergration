@@ -65,7 +65,7 @@ app.use('/lifeAssurrence', lifeAssuranceRoutes);
 app.use('/v2/zesa', zesaV2Routes);
 app.use('/v2/airtime', airTimeRoutesV2);
 app.use('/v2/telone', telOneRoutes)
-app.use('/rate', rateRoutes)
+app.use('/rate', rateRoutes);
 
 //  the new route
 

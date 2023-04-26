@@ -244,7 +244,7 @@ export const netoneAirtimeControllerV2 = (req, res, next) => {
 
                                             // sendSMS(`${targetMobile}`, data.data)
                                             // using the Madyo sms gateway
-                                            smsGateway(`Airtime Credited with $${transactionAmount / 100}00`, targetMobile);
+                                            smsGateway(`Airtime Credited with $${transactionAmount / 100}`, targetMobile);
                                         })
 
                                     res.send(data.data)
@@ -400,6 +400,120 @@ export const netoneAirtimeControllerV2 = (req, res, next) => {
 
 
 
+
+
+
+}
+
+export const netoneAirtimeControllerV2Cash = (req, res, next) => {
+
+
+    const { amount, targetMobile, currencyCode } = req.body;
+    const cents = amount * 100;
+
+    axios.post(`${url}`,
+        {
+            "mti": "0200",
+            "vendorReference": generateAirtimeVendorRefence("netone"),
+            "processingCode": "U50000",
+            "vendorNumber": vendorNumbers._liveVendorNumber,
+            "transactionAmount": cents,
+            "sourceMobile": netoneSouceMobile,
+            "targetMobile": `263${targetMobile.slice(1)}`,
+            "utilityAccount": `263${targetMobile.slice(1)}`,
+            "merchantName": "NETONE",
+            "productName": "NETONE_AIRTIME",
+            "transmissionDate": nowDate(),
+            "currencyCode": currencyCode,
+            "apiVersion": "02",
+            "serviceId": "CS"
+
+        },
+        {
+            auth: {
+                username: process.env.API_USERNAME,
+                password: process.env.API_PASSWORD
+            }
+        }
+
+    )
+        .then(data => {
+
+            const { vendorReference, transactionAmount, utilityAccount, narrative, currencyCode, sourceMobile, targetMobile, transmissionDate } = data.data;
+
+            // console.log(data.data)
+            if (data.data.responseCode === "05") {
+
+                // save the failed transaction in the database
+                //  save the airtime transaction in the database 
+                new Airtime({
+                    orderNumber: nanoid(10),
+                    vendorReference: vendorReference,
+                    type: "netone",
+                    amount: transactionAmount / 100,
+                    status: "failed",
+                    utilityAccount: utilityAccount,
+                    narrative: narrative,
+                    currencyCode, currencyCode,
+                    sourceMobile: sourceMobile,
+                    targetMobile: targetMobile,
+                    date: transmissionDate
+                }).save();
+
+                // res.send(data.data)
+                console.log("General Error.. response code 05")
+                return res.json({
+                    error: "err01",
+                    message: data.data.narrative,
+                    description: data.data
+                })
+            }
+
+            if (data.data.responseCode === "09") {
+
+                res.json({
+                    code: "09",
+                    message: "Transaction is being processed please wait "
+                })
+                setTimeout(() => {
+                    airtimeResendController(data.data)
+                }, 60000);
+
+            }
+
+            else {
+                // save transaction in the database and  send an sms to 
+                // the client with the credited amount and the client final balance after airtime purchase
+
+
+
+                //  save the airtime transaction in the database 
+                new Airtime({
+                    orderNumber: nanoid(10),
+                    vendorReference: vendorReference,
+                    type: "econet",
+                    amount: transactionAmount / 100,
+                    status: "success",
+                    utilityAccount: utilityAccount,
+                    narrative: narrative,
+                    currencyCode, currencyCode,
+                    sourceMobile: sourceMobile,
+                    targetMobile: targetMobile,
+                    date: transmissionDate
+                })
+                    .save()
+                    .then(() => {
+                        //  send SMS to client using Twilio
+
+
+                        // sendSMS(`${targetMobile}`, data.data)
+                        // using the Madyo sms gateway
+                        smsGateway(`Airtime Credited with $${transactionAmount / 100}00`, targetMobile);
+                    })
+
+                res.send(data.data)
+            }
+        })
 
 
 

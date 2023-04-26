@@ -1,4 +1,6 @@
 /node_modules
 .env
 /frontend/node_modules 
-/wordpress-code
+/wordpress-plugins/wordpress
+
+/worpress-plugins

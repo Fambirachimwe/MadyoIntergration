@@ -1,7 +1,7 @@
 import 'dotenv/config';
-import { econetAirtimeControllerV2 } from '../controllers/econetAirtime.controllerV2.js';
-import { netoneAirtimeControllerV2 } from '../controllers/netoneAirtime.controllerV2.js';
-import { telecelAirtimeControllerV2 } from '../controllers/telecelAirtime.controllerV2.js';
+import { econetAirtimeControllerV2, econetAirtimeControllerV2Cash } from '../controllers/econetAirtime.controllerV2.js';
+import { netoneAirtimeControllerV2, netoneAirtimeControllerV2Cash } from '../controllers/netoneAirtime.controllerV2.js';
+import { telecelAirtimeControllerV2, telecelAirtimeControllerV2Cash } from '../controllers/telecelAirtime.controllerV2.js';
 import express from 'express';
 
 
@@ -15,6 +15,16 @@ const router = express.Router();
 router.post(`/econet/buy`, econetAirtimeControllerV2);
 router.post(`/netone/buy`, netoneAirtimeControllerV2);
 router.post(`/telecel/buy`, telecelAirtimeControllerV2);
+
+// add cash transactions
+
+router.post(`/econet/buy/cash`, econetAirtimeControllerV2Cash);
+
+router.post(`/netone/buy/cash`, netoneAirtimeControllerV2Cash);
+
+router.post(`/telecel/buy/cash`, telecelAirtimeControllerV2Cash);
+
+// econetAirtimeControllerV2Cash
 
 
 

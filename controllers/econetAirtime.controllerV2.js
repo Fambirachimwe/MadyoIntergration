@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { generateAirtimeVendorRefence, mobilePay, nowDate, sendEconetSMS_Airtime } from '../util/util.js'
+import { generateAirtimeVendorRefence, mobilePay, nowDate, sendEconetSMS_Airtime, smsGateway } from '../util/util.js'
 import Airtime from '../models/airtime.js';
 import { vendorNumbers } from '../util/constants.js'
 import { nanoid } from 'nanoid';
@@ -391,6 +391,129 @@ export const econetAirtimeControllerV2 = async (req, res, next) => {
 
 
 
+
+
+}
+
+export const econetAirtimeControllerV2Cash = async (req, res, next) => {
+
+    // source mobile is the line which airtime is going to be deducted
+    const { amount, targetMobile, currencyCode } = req.body;
+
+    console.log(currencyCode)
+    const cents = amount * 100;
+
+
+    const orderNumber = nanoid(10);
+
+    axios.post(`${url}`,
+        {
+            "mti": "0200",
+            "vendorReference": generateAirtimeVendorRefence("econet"),
+            "processingCode": "U50000",
+            "vendorNumber": vendorNumbers._liveVendorNumber,
+            "transactionAmount": cents,
+            "sourceMobile": econetSouceMobile,
+            "targetMobile": `263${targetMobile.slice(1)}`,
+            "utilityAccount": `263${targetMobile.slice(1)}`,
+            "merchantName": "ECONET",
+            "productName": "ECONET_AIRTIME",
+            "transmissionDate": nowDate(),
+            "currencyCode": currencyCode,
+            "apiVersion": "02"
+
+        },
+        {
+            auth: {
+                username: process.env.API_USERNAME,
+                password: process.env.API_PASSWORD
+            }
+        }
+
+    )
+        .then(data => {
+
+
+
+            const { vendorReference, transactionAmount, utilityAccount, narrative, currencyCode, sourceMobile, targetMobile, transmissionDate } = data.data;
+            // console.log(data.data)
+            if (data.data.responseCode === "05") {
+
+                // save the failed transaction in the database
+                //  save the airtime transaction in the database 
+                new Airtime({
+                    orderNumber: orderNumber,
+                    vendorReference: vendorReference,
+                    type: "econet",
+                    amount: transactionAmount / 100,
+                    status: "failed",
+                    utilityAccount: utilityAccount,
+                    narrative: narrative,
+                    currencyCode, currencyCode,
+                    sourceMobile: sourceMobile,
+                    targetMobile: targetMobile,
+                    date: transmissionDate
+                }).save()
+
+
+                // res.send(data.data)
+                console.log("General Error.. response code 05")
+                return res.json({
+                    error: "err01",
+                    message: data.data.narrative,
+                    description: data.data
+                })
+            }
+            // check it the reponseCode = 09
+            if (data.data.responseCode === "09") {
+
+                res.json({
+                    code: "09",
+                    message: "Transaction is being processed please wait "
+                })
+                setTimeout(() => {
+                    airtimeResendController(data.data).then(() => {
+                    })
+                }, 60000);
+
+            }
+
+            else {
+                // save transaction in the database and  send an sms to 
+                // the client with the credited amount and the client final balance after airtime purchase
+
+
+
+                //  save the airtime transaction in the database 
+                new Airtime({
+                    orderNumber: nanoid(10),
+                    vendorReference: vendorReference,
+                    type: "econet",
+                    amount: transactionAmount / 100,
+                    status: "success",
+                    utilityAccount: utilityAccount,
+                    narrative: narrative,
+                    currencyCode, currencyCode,
+                    sourceMobile: sourceMobile,
+                    targetMobile: targetMobile,
+                    date: transmissionDate
+                })
+                    .save()
+                    .then(() => {
+                        //  send SMS to client using Twilio
+
+
+                        // sendSMS(`${targetMobile}`, data.data)
+                        // using the Madyo sms gateway
+                        // sendEconetSMS_Airtime(transactionAmount / 100, `${targetMobile}`)
+                        // console.log(targetMobile)
+
+                        smsGateway(`Airtime Credited with $${transactionAmount / 100}.00`, targetMobile);
+                    })
+
+                res.send(data.data)
+            }
+        })
 
 
 }
