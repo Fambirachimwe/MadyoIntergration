@@ -486,7 +486,6 @@ export const netoneAirtimeControllerV2Cash = (req, res, next) => {
                 // the client with the credited amount and the client final balance after airtime purchase
 
 
-
                 //  save the airtime transaction in the database 
                 new Airtime({
                     orderNumber: nanoid(10),
