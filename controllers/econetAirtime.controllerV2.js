@@ -402,13 +402,16 @@ export const econetAirtimeControllerV2Cash = async (req, res, next) => {
 
     console.log(currencyCode)
     const cents = amount * 100;
-    let productName;
+    let productName, merchantName;
 
     if (currencyCode === "USD") {
-        productName = "ECONET_USD_AIRTIME"
+        productName = "ECONET_USD_AIRTIME";
+        merchantName = "ECONET_BUNDLES"
 
     } else {
-        productName = "ECONET_AIRTIME"
+        productName = "ECONET_AIRTIME";
+        merchantName = "ECONET"
+
     }
 
 
@@ -477,7 +480,7 @@ export const econetAirtimeControllerV2Cash = async (req, res, next) => {
 
 
             const { vendorReference, transactionAmount, utilityAccount, narrative, currencyCode, sourceMobile, targetMobile, transmissionDate } = data.data;
-            // console.log(data.data)
+            console.log(data.data)
             if (data.data.responseCode === "05") {
 
                 // save the failed transaction in the database
