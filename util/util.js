@@ -38,9 +38,9 @@ export const randomString = (length, chars) => {
 
 export const generateAirtimeVendorRefence = (ref) => {
 
-
+    // ECOUSD112357
     let reference;
-    const econet = "ECONET";
+    const econet = "ECOUSD112357";
     const netone = "liveNetOne";
     const _telecel = "TELECEL";
 
