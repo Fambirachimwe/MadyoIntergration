@@ -444,7 +444,7 @@ export const econetAirtimeControllerV2Cash = async (req, res, next) => {
             "sourceMobile": econetSouceMobile,
             "targetMobile": `263${targetMobile.slice(1)}`,
             "utilityAccount": `263${targetMobile.slice(1)}`,
-            "merchantName": "ECONET_BUNDLES",
+            "merchantName": `${merchantName}`,
             "productName": `${productName}`,
             "transmissionDate": nowDate(),
             "currencyCode": currencyCode,
