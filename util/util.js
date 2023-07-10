@@ -187,46 +187,46 @@ export const sendZesaToken = (token, number, meterNumber, amount) => {
 
     const baseSmsUrl = econetSMSGatewayUrl;
     const currentTime = new Date();
-    if (econet.test(number)) {
-        //  this is an econet number
-        // do send the message using the ecoent gateway 
-        axios.post(`${baseSmsUrl}`, {
-            sms: sms,
-            number: number,
-            title: "From MadyoZW"
-        }).then()
-            .catch(err => {
-                console.log(err)
-            });
+    // if (econet.test(number)) {
+    //  this is an econet number
+    // do send the message using the ecoent gateway 
+    // axios.post(`${baseSmsUrl}`, {
+    //     sms: sms,
+    //     number: number,
+    //     title: "From MadyoZW"
+    // }).then()
+    //     .catch(err => {
+    //         console.log(err)
+    //     });
 
-    } else {
-        //  send an sms using the e solution gateway
-        axios.post(`${eSolutionsSmsGatewayUrl}`,
-            {
-                "originator": "MadyoZW",
-                "destination": `${number}`,
-                "messageText": sms,
-                "messageReference": nanoid(10),
-                "messageDate": nowDate(),
-                "messageValidity": "03:00",
-                "sendDateTime": `${currentTime.getHours()}:${currentTime.getMinutes()}`
-            },
-            {
-                auth: {
-                    username: process.env.MADYO_SMS_USERNAME,
-                    password: process.env.MADYO_SMS_PASSWORD
-                }
+
+    //  send an sms using the e solution gateway
+    axios.post(`${eSolutionsSmsGatewayUrl}`,
+        {
+            "originator": "MadyoZW",
+            "destination": `${number}`,
+            "messageText": sms,
+            "messageReference": nanoid(10),
+            "messageDate": nowDate(),
+            "messageValidity": "03:00",
+            "sendDateTime": `${currentTime.getHours()}:${currentTime.getMinutes()}`
+        },
+        {
+            auth: {
+                username: process.env.MADYO_SMS_USERNAME,
+                password: process.env.MADYO_SMS_PASSWORD
             }
-        )
-            .then(data => {
-                if (data.data.status === "FAILED") {
-                    console.log("failed to send message using the e solution gateway ", data.data.narrative)
-                }
-            })
-            .catch(err => {
-                console.log(err) // put this in logger file.. and save them to the database
-            })
-    }
+        }
+    )
+        .then(data => {
+            if (data.data.status === "FAILED") {
+                console.log("failed to send message using the e solution gateway ", data.data.narrative)
+            }
+        })
+        .catch(err => {
+            console.log(err) // put this in logger file.. and save them to the database
+        })
+
 
 
 }
