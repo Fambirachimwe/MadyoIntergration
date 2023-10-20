@@ -197,6 +197,8 @@
                     meterNumber: meterNumber
                 };
 
+                console.log(getCustomerUrl);
+
                 $.post(getCustomerUrl, _data, function (res) {
                     console.log(res);
 
@@ -436,8 +438,9 @@
             })
 
 
+            // get customer 1
             function getCustomer() {
-                var getCustomerUrl = "https://madyointergration-production.up.railway.app/zesa/getCustomer";
+                var getCustomerUrl = "https://madyointergration-production.up.railway.app/v2/zesa/getCustomer";
 
                 var _data = {
                     meterNumber: meterNumber
