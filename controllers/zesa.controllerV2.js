@@ -29,7 +29,7 @@ export const getCustomer = (req, res, next) => {
             "mti": "0200",
             "vendorReference": generateZesaVendorRefence(),
             "processingCode": "310000",
-            "transactionAmount": 600000,  // this is  only specified in the documentaion but does not make sense
+            "transactionAmount": 100000,  // this is  only specified in the documentaion but does not make sense
             "transmissionDate": nowDate(),
             "vendorNumber": vendorNumbers._liveVendorNumber,
             "merchantName": "ZETDC",
@@ -51,6 +51,8 @@ export const getCustomer = (req, res, next) => {
 
         console.log(data.data)
         res.send(data.data)
+    }).catch(error => {
+        console.log(error)
     })
 }
 
