@@ -246,7 +246,7 @@ export const buyToken = (req, res, next) => {
                                                 console.log('saved into the database ', saved_data);
 
 
-                                                sendZesaToken(saved_data.token, targetMobile, meterNumber, amount)
+                                                sendZesaToken(saved_data.token, targetMobile, meterNumber, amount, response = saved_data)
                                             });
 
                                         res.json({
@@ -439,7 +439,9 @@ export const buyToken = (req, res, next) => {
                                         .then(saved_data => {
                                             console.log('saved into the database ', saved_data);
                                             // send token via sms 
-                                            sendZesaToken(saved_data.token, phoneNumber, meterNumber, amount);
+                                            // sendZesaToken(saved_data.token, phoneNumber, meterNumber, amount);
+
+                                            sendZesaToken(phoneNumber, saved_data);
                                         });
 
                                     res.json({
@@ -488,7 +490,9 @@ export const buyToken = (req, res, next) => {
                                                     .save()
                                                     .then(saved_data => {
                                                         console.log('saved into the database ', saved_data);
-                                                        sendZesaToken(phoneNumber, saved_data.token);
+                                                        // sendZesaToken(phoneNumber, saved_data.token);
+
+                                                        sendZesaToken(phoneNumber, saved_data);
                                                     });
 
                                                 res.json({
@@ -524,7 +528,9 @@ export const buyToken = (req, res, next) => {
                                         .save()
                                         .then(saved_data => {
                                             console.log('saved failed request into the database ', saved_data);
-                                            sendZesaToken(phoneNumber, saved_data.token);
+                                            // sendZesaToken(phoneNumber, saved_data.token);
+
+                                            sendZesaToken(phoneNumber, saved_data);
                                         });
                                     res.json({
                                         message: data.data.narrative,
@@ -718,7 +724,7 @@ export const buyTokenMasterCard = (req, res, next) => {
                                 .then(saved_data => {
                                     console.log('saved into the database ', saved_data);
                                     // send token via sms 
-                                    sendZesaToken(saved_data.token, phoneNumber, meterNumber, amount);
+                                    sendZesaToken(phoneNumber, saved_data);
                                 });
 
                             res.json({

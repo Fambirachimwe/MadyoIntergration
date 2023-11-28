@@ -160,47 +160,112 @@ const formartMessage = (_str) => {
     }
 }
 
+// new formartt fro zesa sms 
+const formatSmsToken = (response) => {
+    // Extract required information from the response object
+    const {
+        tokens,
+        meterNumber,
+        energy,
+        energyCharge,
+        debtRecovered,
+        reaLevy,
+        valueAddedTax,
+        totalPurchaseValue,
+        amountTendered,
+        transactionDateTime,
+        instructionText,
+    } = response;
+
+    // Format token numbers
+    const tokenNumbers = tokens.map((token) => `Token_${token}`).join('\n');
+
+    // Format the transaction date and time
+    const formattedTransactionDateTime = transactionDateTime.toLocaleString();
+
+    // Construct the formatted SMS token
+    const formattedSmsToken = `${tokenNumbers}
+  Meter: ${meterNumber}
+  KwH: ${energy}
+  Energy: ${energyCharge}
+  Debt: ${debtRecovered}
+  REA: ${reaLevy}
+  VAT: ${valueAddedTax}
+  Total Amt: ${totalPurchaseValue}
+  Amt Tendered: ${amountTendered}
+  ${formattedTransactionDateTime}
+  Please input tokens in the given order
+  ${instructionText}`;
+
+    return formattedSmsToken;
+}
+
+const extractTokenValue = (obj) => {
+    const token = obj.token;
+
+    if (!token) {
+        return []; // Token value not found, return an empty array
+    }
+
+    const tokens = token.split("#"); // Split the token by '#'
+    const results = tokens.map((t, index) => {
+        const values = t.split("|"); // Split each token by '|'
+        const tokenNumber = `token`; // Generate token key (e.g., token1, token2, etc.)
+        const tokenValue = values[0].replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+        ; // Format token value with spaces every three digits
+        return { tokenValue, units: values[1], vat: values[5] }; // Create an object with token number as key and formatted value as value
+    });
+
+    return results;
+}
+
+// new sms body
+const smsBody = (obj) => {
+
+    // console.log("this is the sms body", obj)
+
+    if (obj.responseCode === "00") {
+        const sms =
+            `
+    ${extractTokenValue(obj).map((token, index) => { return `Token${index + 1}: ${token.tokenValue}` })}
+    Meter: ${obj.utilityAccount}
+    KwH: ${extractTokenValue(obj).map((token, index) => { return `${token.units}` })[0]}
+    Energy: ${extractTokenValue(obj).map((token, index) => { return `${token.units}` })[0]}
+    Debt: ${obj?.arrears ? obj?.arrears : `$0.00`}
+    REA: 
+    VAT:  ${extractTokenValue(obj).map((token, index) => { return `${token.vat}` })[0]}
+    Total Amt:  ${obj?.transactionAmount}
+    ${obj.transmissionDate}
+    Please input tokens in their given order
+
+    `
+        return sms
+    } else {
+        return new Error("There is an error in the respons object")
+    }
+
+}
 
 
-export const sendZesaToken = (token, number, meterNumber, amount) => {
 
-    const econet = /^077|^078/;
+export const sendZesaToken = (number, response) => {
+
+    // const econet = /^077|^078/;
     // const telecel = /^073/;
-    // const netone = /^071/;
-
-    const messageObject = formartMessage(token)
+    // const netone = /^071/
+    // const messageObject = formartMessage(token)
 
     // example of the token data from the response 
 
     // 34397317664422574275|4.8||RCT1666967869069|47170|0|0
     console.log('sending zesa token to this number', number);
 
-    const sms = `token: ${messageObject.token}
-    meter: ${meterNumber}
-    kWH: ${messageObject.units}
-    Energy: ${messageObject.netAmount}
-    Amount: ${amount}`;   // send the data to be sent as a string
+    const sms = smsBody(response)
 
-
-
-
-
-    const baseSmsUrl = econetSMSGatewayUrl;
+    // send the data to be sent as a string
     const currentTime = new Date();
-    // if (econet.test(number)) {
-    //  this is an econet number
-    // do send the message using the ecoent gateway 
-    // axios.post(`${baseSmsUrl}`, {
-    //     sms: sms,
-    //     number: number,
-    //     title: "From MadyoZW"
-    // }).then()
-    //     .catch(err => {
-    //         console.log(err)
-    //     });
-
-
     //  send an sms using the e solution gateway
+    // https://mobile.esolutions.co.zw/bmg/api/single
     axios.post(`${eSolutionsSmsGatewayUrl}`,
         {
             "originator": "MadyoZW",
