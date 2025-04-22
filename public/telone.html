@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script> -->
+    <link rel="stylesheet" href="./styles.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"
+        crossorigin="anonymous"></script>
+
+
+    <title>Madyo Bill Payments</title>
+
+</head>
+
+<body>
+
+    <nav class="navbar navbar-expand-lg bg-success">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Madyo Bill Payments</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
+                aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link " href="/index.html">Zesa</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/airtime.html">Airtime</a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="/telone.html">Telone</a>
+                    </li>
+
+
+                </ul>
+
+            </div>
+        </div>
+    </nav>
+    <br>
+
+
+
+
+
+    <div class="loader">
+        <div class="_loader_circle"></div>
+        <h2 class="title">Processing please wait ...</h2>
+    </div>
+
+
+    <div class="wrapper_container">
+
+
+
+        <div class="telone_form">
+            <div class="contents">
+
+                <div class="fieldset">
+                    <div id="step1" class="form_container_1 align=" center">
+                        <h2 class="title">Telone Bill</h2>
+                        <div class="text-center">
+                            <div class="row justify-content-center">
+                                <div class="col-md-6">
+                                    <div class="op_item"><img src="https://madyozw.com/paymentmethod/telone.png" alt=""
+                                            height="200"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <form>
+
+                            <div class="form-group">
+                                <input required type="text" class="form-control" id="cf-amount"
+                                    placeholder="Utility Account Number">
+                                <br>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Service</label>
+                                <select name="select_service" class="form-control" id="select_service" value="">
+                                    <option value="blaze"> Blaze</option>
+                                    <option value="voice"> Prepaid Voice </option>
+                                    <option value="adsl_fibre"> ADSL / Fibre</option>
+
+                                </select>
+                            </div>
+                            <br>
+
+                            <div class="form-group">
+                                <label>Select Package</label>
+                                <select id="package" class="form-control">
+                                    <option value="">-- Select ADSL/Fibre product --</option>
+                                </select>
+                            </div>
+                            <br>
+                            <input required class="btn btn-success next" type="button" value="Next">
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="fieldset">
+                <div id="step2" class="form_container_2">
+                    <div class="zesa_step2">
+                        <h2 class="title">Verify Details</h2>
+                        <br>
+                        <p>Check the details below before making payment</p>
+
+                        <div class="details_container">
+                            <div class="_row">
+                                <p>Customer details</p>
+                                <p id="details" class="_dt"></p>
+                            </div>
+                            <div class="_row">
+                                <p>Utility Account</p>
+                                <p id="meterNumber" class="_dt"></p>
+                            </div>
+                            <div class="_row">
+                                <p>Package</p>
+                                <p id="package" class="_dt"></p>
+                            </div>
+
+                            <div class="_row">
+                                <p>Amount</p>
+                                <p id="amount" class="_dt"></p>
+                            </div>
+                        </div>
+
+
+                        <div class="btn_container">
+                            <button id="next_2" class="next">Next</button>
+                            <button id="back_2" class="back">Back</button>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+        </div>
+    </div>
+
+
+
+    </div>
+
+
+
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script type="text/javascript">
+
+
+        //  fetching products 
+        // Fetch products from API endpoint
+
+        // initial products
+        const setInitial = function(){
+            $.ajax({
+            url: 'http://localhost:5600/v2/telone/products',
+            type: 'GET',
+            dataType: 'json',
+            success: function (response) {
+                // Loop through ADSL/Fibre products and add them to select tag
+
+                if($('#select_service').val() === "blaze"){
+                        $.each(response.blaze, function (index, product) {
+                        $('#package').append($('<option>', {
+                            value: product.productCode,
+                            text: product.productName
+                        }));
+                    });
+                }
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                console.log('Error fetching products:', textStatus, errorThrown);
+            }
+            });
+            
+        }
+
+        setInitial();
+            
+
+        $('#select_service').change(function(){
+            $.ajax({
+            url: 'http://localhost:5600/v2/telone/products',
+            type: 'GET',
+            dataType: 'json',
+            success: function (response) {
+                // Loop through ADSL/Fibre products and add them to select tag
+
+                if($('#select_service').val() === "blaze"){
+                        $.each(response.blaze, function (index, product) {
+                        $('#package').append($('<option>', {
+                            value: product.productCode,
+                            text: product.productName
+                        }));
+                    });
+                }
+
+                else if($('#select_service').val()  === "voice"){
+                        $.each(response.voice, function (index, product) {
+                        $('#package').append($('<option>', {
+                            value: product.productCode,
+                            text: product.productName
+                        }));
+                    });
+                }
+
+                else if($('#select_service').val()  === "adsl_fibre"){
+                        $.each(response.adsl_fibre, function (index, product) {
+                        $('#package').append($('<option>', {
+                            value: product.productCode,
+                            text: product.productName
+                        }));
+                    });
+                }
+                
+
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                console.log('Error fetching products:', textStatus, errorThrown);
+            }
+        });
+
+        })
+
+        
+
+
+
+
+        const paymentSelected = false;
+        var step1 = document.getElementById("step1");
+        var step2 = document.getElementById("step2");
+
+        var mobileMoneyContainer = document.getElementById("mobileMoneyContainer");
+
+
+        $(document).ajaxStart(function () {
+            // Show image container
+            $(".loader").show();
+        });
+        $(document).ajaxComplete(function () {
+            // Hide image container
+            $(".loader").hide();
+        });
+
+        $(document).ready(function () {
+            var step = 1, current_step, next_step, steps;
+            steps = $(".fieldset").length;
+
+
+            let amount;
+            let targetMobile;
+            let payingNumber;
+
+
+            $("#step2").hide();
+            $("#mobileMoneyContainer").hide();
+            $("#PesepayMoneyContainer").hide();
+            // $()
+
+            // console.log(steps)
+
+            $(".next").click(function () {
+                current_step = 1;
+                $("#step1").hide();
+                $("#step2").show();
+
+                amount = $("#cf-amount").val();
+                targetMobile = $("#cf-targetMobile").val();
+                payingNumber = $("#cf-payingNumber").val();
+
+
+                $("#confirm_mobileNumber").html(function () {
+                    return targetMobile
+                });
+                $("#confirm_amount").html(function () {
+                    return amount
+                });
+            });
+
+            $(".method").click(function () {
+                $("#mobileMoneyContainer").show();
+                $("#PesepayMoneyContainer").hide();
+            })
+
+            //pesepay
+
+            $(".pesemethod").click(function () {
+                $("#PesepayMoneyContainer").show();
+                $("#mobileMoneyContainer").hide();
+            })
+
+            $("#cancel").click(function () {
+                $("#step1").show();
+
+                $("#step2").hide();
+                $("#mobileMoneyContainer").hide();
+            });
+
+            $("#pay").click(function (event) {
+                //  do the payment logic here 
+                // event.preventDefault();
+                var type = $("#cf-type").val();
+                var baseUrl = "https://madyointergration-production.up.railway.app/v2";
+                let ajaxUrl;
+                switch (type) {
+                    case "econet":
+                        ajaxUrl = baseUrl + "/airtime/econet/buy";
+                        break;
+
+                    case "netone":
+                        ajaxUrl = baseUrl + "/airtime/netone/buy";
+                        break;
+
+                    case "telecel":
+                        ajaxUrl = baseUrl + "/airtime/telecel/buy";
+                        break;
+                }
+
+                payingNumber = $("#cf-payingNumber").val();
+
+                var data = {
+                    amount, targetMobile, payingNumber
+                }
+                console.log(data)
+
+
+                $.post(ajaxUrl, data, function (res) {
+                    // $(".loader").css("display", "none");
+                    console.log(res);
+
+                    if (res.error === "err01") {
+                        const message = res.message;
+
+                        Swal.fire({
+                            title: "Error!",
+                            text: `Telone bundle purchase failed`,
+                            icon: "error",
+                            confirmButtonText: "OK"
+                        });
+                    } else if (res.responseCode === "00") {
+                        Swal.fire({
+                            title: "Success!",
+                            text: "Transaction processed successfully ",
+                            icon: "success",
+                            confirmButtonText: "OK"
+                        });
+                    }
+                })
+
+            })
+
+
+            //pay with pesepay
+
+            $("#pesepay").click(function (event) {
+                var baseUrl = "https://madyointergration-production.up.railway.app/v2";
+                let ajaxUrl;
+
+                var payment_mode = document.getElementById("#cf-payment_mode");
+                //KEY,INT,                            Ecocash,mastercard,
+                var data = {
+                    amount, payingNumber
+                }
+                console.log(data)
+
+
+                $.post(ajaxUrl, data, function (res) {
+                    console.log(res);
+
+                    if (res.error === "err01") {
+                        const message = res.message;
+
+                        Swal.fire({
+                            title: "Error!",
+                            text: `Telone Wi-fi purchase failed`,
+                            icon: "error",
+                            confirmButtonText: "OK"
+                        });
+                    } else if (res.responseCode === "00") {
+                        Swal.fire({
+                            title: "Success!",
+                            text: "Transaction processed successfully ",
+                            icon: "success",
+                            confirmButtonText: "OK"
+                        });
+                    }
+                })
+
+            })
+
+
+
+
+        })
+
+    </script>
+
+
+</body>
+
+</html>

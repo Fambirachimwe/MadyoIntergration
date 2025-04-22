@@ -1,0 +1,62 @@
+Assuming you want to display the products in three separate select tags for each category (adsl_fibre, blaze, and voice), here's an example HTML code that fetches the products from the API endpoint and displays them in select tags:
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Product Selector</title>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+</head>
+<body>
+	<h1>Product Selector</h1>
+	<p>Select a product:</p>
+	<select id="adsl_fibre_select">
+		<option value="">-- Select ADSL/Fibre product --</option>
+	</select>
+	<select id="blaze_select">
+		<option value="">-- Select Blaze product --</option>
+	</select>
+	<select id="voice_select">
+		<option value="">-- Select Voice product --</option>
+	</select>
+	<script>
+		// Fetch products from API endpoint
+		$.ajax({
+			url: 'http://localhost:5600/v2/telone/products',
+			type: 'GET',
+			dataType: 'json',
+			success: function(response) {
+				// Loop through ADSL/Fibre products and add them to select tag
+				$.each(response.adsl_fibre, function(index, product) {
+					$('#adsl_fibre_select').append($('<option>', {
+						value: product.productCode,
+						text: product.productName
+					}));
+				});
+
+				// Loop through Blaze products and add them to select tag
+				$.each(response.blaze, function(index, product) {
+					$('#blaze_select').append($('<option>', {
+						value: product.productCode,
+						text: product.productName
+					}));
+				});
+
+				// Loop through Voice products and add them to select tag
+				$.each(response.voice, function(index, product) {
+					$('#voice_select').append($('<option>', {
+						value: product.productCode,
+						text: product.productName
+					}));
+				});
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				console.log('Error fetching products:', textStatus, errorThrown);
+			}
+		});
+	</script>
+</body>
+</html>
+```
+
+This code uses jQuery to make an AJAX request to the API endpoint and add the products to the select tags. The product names are displayed in the select options, and the product codes are used as the option values. Note that you'll need to replace the API endpoint URL in the code with the actual endpoint URL.
