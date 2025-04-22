@@ -24,6 +24,18 @@ router.post('/getCustomer', (req, res, next) => {
         "utilityAccount": `${utilityAccount}`,
         "productName": 500034
 
+        // {
+        //     "mti": "0200",
+        //     "vendorReference": "03142309135s",
+        //     "processingCode": "310000",
+        //     "transmissionDate": "30920081415",
+        //     "vendorNumber":"VE19257147501",
+        //     "merchantName": "TELONE",
+        //     "utilityAccount": "242133523",
+        //     "productName" : "HOME_PREM_NIGHT",
+        //     "amount": 94200
+        // } 
+
     },
         {
             auth: {
@@ -41,50 +53,69 @@ router.get('/products', async (req, res, next) => {
 
     const productsUrl = "https://mobile.esolutions.co.zw:86/billpayments/products/merchant/TELONE";
 
-    const response = await axios.get(`${productsUrl}`, {
-        auth: {
-            username: process.env.API_USERNAME,
-            password: process.env.API_PASSWORD
-        }
-    });
-    const products = response.data.products
+    // https://mobile.esolutions.co.zw:8083/billpayments/products/merchant/TELONE
+    // https://mobile.esolutions.co.zw:86/billpayments/vend
 
-    const home = products.filter((_package) => {
-        return _package.productName.search("Home") != -1
-    })
+    //     testUserName=testz_api_user01
+    // testPassword=csssbynd
 
+    try {
+        const response = await axios.get(`${productsUrl}`, {
+            auth: {
+                username: process.env.API_USERNAME,
+                password: process.env.API_PASSWORD
+            }
+        });
+        const products = response?.data?.products;
+        const filteredProducts = products.sort((a, b) => a.productCode - b.productCode);
 
-    const infinity = products.filter((_package) => {
+        const adsl_fibre = filteredProducts.filter(product => { return parseInt(product.productCode) >= 500137 && parseInt(product.productCode) <= 500149 })
 
-        return _package.productName.search("Infinity") != -1
+        const voice = filteredProducts.filter(product => { return parseInt(product.productCode) >= 105 && parseInt(product.productCode) <= 126 });
 
-    })
-
-    const Intense = products.filter((_package) => {
-        return _package.productName.search("Intense") != -1
-    })
-
-    const Voice = products.filter((_package) => {
-
-        return _package.productName.search("Voice") != -1
-
-    })
+        const blaze = filteredProducts.filter(product => { return parseInt(product.productCode) >= 500150 && parseInt(product.productCode) <= 500155 })
 
 
-    const blaze = products.filter((_package) => {
+        res.json({
+            adsl_fibre,
+            blaze,
+            voice
+            // products
 
-        return _package.productName.search("Blaze") != -1
+        });
 
-    })
+    } catch (error) {
+        res.status(400).send(error)
+    }
 
-    const adsl_fibre = [...home, ...infinity, ...Intense]
+    // const response = await axios.get(`${productsUrl}`, {
+    //     auth: {
+    //         username: process.env.testUserName,
+    //         password: process.env.testPassword
+    //     }
+    // });
+
+    // console.log(response.data)
 
 
-    res.json({
-        "adsl_fibre": adsl_fibre,
-        blaze: blaze,
-        voice: Voice
-    });
+    // const products = response?.data?.products;
+    // const filteredProducts = products.sort((a, b) => a.productCode - b.productCode);
+
+    // const adsl_fibre = filteredProducts.filter(product => { return parseInt(product.productCode) >= 51 && parseInt(product.productCode) <= 61 })
+
+    // const voice = filteredProducts.filter(product => { return parseInt(product.productCode) >= 105 && parseInt(product.productCode) <= 126 });
+
+    // const blaze = filteredProducts.filter(product => { return parseInt(product.productCode) >= 620 && parseInt(product.productCode) <= 625 })
+
+
+    // res.json({
+    //     adsl_fibre,
+    //     blaze,
+    //     voice
+
+    // });
+
+
 
 
 });

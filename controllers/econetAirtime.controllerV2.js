@@ -402,27 +402,71 @@ export const econetAirtimeControllerV2Cash = async (req, res, next) => {
 
     console.log(currencyCode)
     const cents = amount * 100;
+    let productName, merchantName;
+
+    if (currencyCode === "USD") {
+        productName = "ECONET_USD_AIRTIME";
+        merchantName = "ECONET_BUNDLES"
+
+    } else {
+        productName = "ECONET_AIRTIME";
+        merchantName = "ECONET"
+
+    }
 
 
     const orderNumber = nanoid(10);
+
+    // {
+    //     "mti" : "0200",
+    //     "vendorReference":"ECOUSD112357",
+    //     "processingCode":"U50000",
+    //     "billPaymentType":"PREPAID",
+    //     "vendorNumber":"VE19257147G5501",
+    //     "transactionAmount":10, 
+    //     "sourceMobile":"263772291841",
+    //     "targetMobile":"263772291841",
+    //     "utilityAccount":"263772291841",
+    //     "merchantName":"ECONET_BUNDLES",
+    //     "productName":"ECONET_USD_AIRTIME",
+    //     "transmissionDate":91916182800,
+    //     "currencyCode":"USD"
+    //  }
 
     axios.post(`${url}`,
         {
             "mti": "0200",
             "vendorReference": generateAirtimeVendorRefence("econet"),
             "processingCode": "U50000",
+            "billPaymentType": "PREPAID",
             "vendorNumber": vendorNumbers._liveVendorNumber,
             "transactionAmount": cents,
             "sourceMobile": econetSouceMobile,
             "targetMobile": `263${targetMobile.slice(1)}`,
             "utilityAccount": `263${targetMobile.slice(1)}`,
-            "merchantName": "ECONET",
-            "productName": "ECONET_AIRTIME",
+            "merchantName": `${merchantName}`,
+            "productName": `${productName}`,
             "transmissionDate": nowDate(),
             "currencyCode": currencyCode,
             "apiVersion": "02"
 
         },
+
+        // {
+        //     "mti": "0200",
+        //     "vendorReference": "ECOUSD113yq7",
+        //     "processingCode": "U50000",
+        //     "billPaymentType": "PREPAID",
+        //     "vendorNumber": "VE28436262401",
+        //     "transactionAmount": 100,
+        //     "sourceMobile": "263772291841",
+        //     "targetMobile": "263782824073",
+        //     "utilityAccount": "263782824073",
+        //     "merchantName": "ECONET_BUNDLES",
+        //     "productName": "ECONET_USD_AIRTIME",
+        //     "transmissionDate": 91916182800,
+        //     "currencyCode": "USD"
+        // }
         {
             auth: {
                 username: process.env.API_USERNAME,
@@ -436,7 +480,7 @@ export const econetAirtimeControllerV2Cash = async (req, res, next) => {
 
 
             const { vendorReference, transactionAmount, utilityAccount, narrative, currencyCode, sourceMobile, targetMobile, transmissionDate } = data.data;
-            // console.log(data.data)
+            console.log(data.data)
             if (data.data.responseCode === "05") {
 
                 // save the failed transaction in the database

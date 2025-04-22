@@ -33,6 +33,7 @@ export const buyTokenCash = (req, res, next) => {
             "vendorReference": generateZesaVendorRefence(),
             "processingCode": "U50000",
             "transactionAmount": cents,
+            "amount": cents,
             "transmissionDate": nowDate(),
             "vendorNumber": vendorNumbers._liveVendorNumber,  // replace this with the offical vendor number
             "terminalID": "POS001",
@@ -64,9 +65,7 @@ export const buyTokenCash = (req, res, next) => {
                     .save()
                     .then(saved_data => {
                         console.log('saved into the database ', saved_data);
-
-
-                        sendZesaToken(saved_data.token, targetMobile, meterNumber, amount)
+                        sendZesaToken(phoneNumber, saved_data);
                     });
 
                 res.json({
@@ -115,7 +114,7 @@ export const buyTokenCash = (req, res, next) => {
                                 .save()
                                 .then(saved_data => {
                                     console.log('saved into the database ', saved_data);
-                                    sendZesaToken(saved_data.token, phoneNumber, meterNumber, amount)
+                                    sendZesaToken(phoneNumber, saved_data);
                                 });
 
                             res.json({
@@ -151,7 +150,7 @@ export const buyTokenCash = (req, res, next) => {
                     .save()
                     .then(saved_data => {
                         console.log('saved failed request into the database ', saved_data);
-                        sendZesaToken(phoneNumber, saved_data.token);
+                        // sendZesaToken(phoneNumber, saved_data);
                     });
                 res.json({
                     message: data.data.narrative,

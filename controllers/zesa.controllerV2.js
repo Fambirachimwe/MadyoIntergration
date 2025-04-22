@@ -29,7 +29,7 @@ export const getCustomer = (req, res, next) => {
             "mti": "0200",
             "vendorReference": generateZesaVendorRefence(),
             "processingCode": "310000",
-            "transactionAmount": 50000,  // this is  only specified in the documentaion but does not make sense
+            "transactionAmount": 100000,  // this is  only specified in the documentaion but does not make sense
             "transmissionDate": nowDate(),
             "vendorNumber": vendorNumbers._liveVendorNumber,
             "merchantName": "ZETDC",
@@ -51,6 +51,8 @@ export const getCustomer = (req, res, next) => {
 
         console.log(data.data)
         res.send(data.data)
+    }).catch(error => {
+        console.log(error)
     })
 }
 
@@ -244,7 +246,7 @@ export const buyToken = (req, res, next) => {
                                                 console.log('saved into the database ', saved_data);
 
 
-                                                sendZesaToken(saved_data.token, targetMobile, meterNumber, amount)
+                                                sendZesaToken(saved_data.token, targetMobile, meterNumber, amount, response = saved_data)
                                             });
 
                                         res.json({
@@ -437,7 +439,9 @@ export const buyToken = (req, res, next) => {
                                         .then(saved_data => {
                                             console.log('saved into the database ', saved_data);
                                             // send token via sms 
-                                            sendZesaToken(saved_data.token, phoneNumber, meterNumber, amount);
+                                            // sendZesaToken(saved_data.token, phoneNumber, meterNumber, amount);
+
+                                            sendZesaToken(phoneNumber, saved_data);
                                         });
 
                                     res.json({
@@ -486,7 +490,9 @@ export const buyToken = (req, res, next) => {
                                                     .save()
                                                     .then(saved_data => {
                                                         console.log('saved into the database ', saved_data);
-                                                        sendZesaToken(phoneNumber, saved_data.token);
+                                                        // sendZesaToken(phoneNumber, saved_data.token);
+
+                                                        sendZesaToken(phoneNumber, saved_data);
                                                     });
 
                                                 res.json({
@@ -522,7 +528,9 @@ export const buyToken = (req, res, next) => {
                                         .save()
                                         .then(saved_data => {
                                             console.log('saved failed request into the database ', saved_data);
-                                            sendZesaToken(phoneNumber, saved_data.token);
+                                            // sendZesaToken(phoneNumber, saved_data.token);
+
+                                            sendZesaToken(phoneNumber, saved_data);
                                         });
                                     res.json({
                                         message: data.data.narrative,
@@ -716,7 +724,7 @@ export const buyTokenMasterCard = (req, res, next) => {
                                 .then(saved_data => {
                                     console.log('saved into the database ', saved_data);
                                     // send token via sms 
-                                    sendZesaToken(saved_data.token, phoneNumber, meterNumber, amount);
+                                    sendZesaToken(phoneNumber, saved_data);
                                 });
 
                             res.json({
